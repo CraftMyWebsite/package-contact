@@ -3,8 +3,10 @@
 namespace CMW\Controller\Contact;
 
 use CMW\Controller\Core\CoreController;
+use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
 use CMW\Model\Contact\ContactModel;
+use CMW\Model\Contact\ContactSettingsModel;
 use CMW\Router\Link;
 use CMW\Utils\Utils;
 use CMW\Utils\View;
@@ -19,11 +21,13 @@ class ContactController extends CoreController
 {
 
     private ContactModel $contactModel;
+    private ContactSettingsModel $contactSettingsModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->contactModel = new ContactModel();
+        $this->contactSettingsModel = new ContactSettingsModel();
     }
 
     #[Link(path: "/", method: Link::GET, scope: "/cmw-admin/contact")]
@@ -32,7 +36,7 @@ class ContactController extends CoreController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
-        $config = $this->contactModel->getConfig();
+        $config = $this->contactSettingsModel->getConfig();
 
         View::createAdminView('contact', 'settings')
             ->addScriptBefore("admin/resources/vendors/summernote/summernote.min.js",
@@ -51,10 +55,70 @@ class ContactController extends CoreController
 
         [$captcha, $email, $mail] = Utils::filterInput("captcha", "email", "mail");
 
-
-        $this->contactModel->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $mail);
+        $this->contactSettingsModel->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $mail);
 
         header("Location: settings");
+    }
+
+    #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
+    public function adminContactHistory(): void
+    {
+
+        $messages = $this->contactModel->getMessages();
+
+        View::createAdminView('contact', 'history')
+            ->addVariableList(["messages" => $messages])
+            ->view();
+    }
+
+    #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    public function adminContactRead(int $id): void
+    {
+
+        $message = $this->contactModel->getMessageById($id);
+
+        if(!$message?->isRead()){
+            $this->contactModel->setMessageState($id);
+        }
+
+        View::createAdminView('contact', 'read')
+            ->addScriptAfter("app/package/contact/views/resources/js/main.js")
+            ->addVariableList(["message" => $message])
+            ->view();
+    }
+
+
+    /* PUBLIC AREA */
+
+    #[Link("/", Link::GET, [], "/contact")]
+    public function publicContact(): void
+    {
+        View::basicPublicView("contact", "main");
+    }
+
+    #[Link("/", Link::POST, [], "/contact")]
+    public function publicContactPost(): void
+    {
+        $config = $this->contactSettingsModel->getConfig();
+
+        if ($config?->captchaIsEnable()) {
+            if (SecurityController::checkCaptcha()) {
+                [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
+                $this->contactModel->addMessage($email, $name, $object, $content);
+
+                //TODO TOASTER SUCCESS
+
+                header("Location: /");
+            }
+        } else {
+            [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
+            $this->contactModel->addMessage($email, $name, $object, $content);
+
+            //TODO TOASTER SUCCESS
+
+            header("Location: /");
+        }
+
     }
 
 }

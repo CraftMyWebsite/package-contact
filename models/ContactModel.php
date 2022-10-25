@@ -2,8 +2,9 @@
 
 namespace CMW\Model\Contact;
 
-use CMW\Entity\Contact\ContactSettingsEntity;
+use CMW\Entity\Contact\ContactEntity;
 use CMW\Manager\Database\DatabaseManager;
+use JetBrains\PhpStorm\ExpectedValues;
 
 /**
  * Class: @ContactModel
@@ -14,45 +15,96 @@ use CMW\Manager\Database\DatabaseManager;
 class ContactModel extends DatabaseManager
 {
 
-    public function getConfig(): ?ContactSettingsEntity
+    public function getMessageById(int $id, #[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): ?ContactEntity
     {
-        $sql = "SELECT * FROM cmw_contact_settings LIMIT 1";
+
+        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content,
+                DATE_FORMAT(contact_date, '%d/%m/%Y à %H:%i:%s') AS 'contact_date', contact_is_read
+                FROM cmw_contact WHERE contact_id = :id";
+
+        if ($filter === "READ") {
+            $sql .= "AND contact_is_read = 1";
+        } else if ($filter === "UNREAD") {
+            $sql .= "AND contact_is_read = 0";
+        }
 
         $db = self::getInstance();
+
         $res = $db->prepare($sql);
 
-
-        if (!$res->execute()) {
+        if (!$res->execute(array("id" => $id))) {
             return null;
         }
 
         $res = $res->fetch();
 
-        return new ContactSettingsEntity(
-            $res['contact_settings_captcha'],
-            $res['contact_settings_email'],
-            $res['contact_settings_mail_confirmation']
+        return new ContactEntity(
+            $res['contact_id'],
+            $res['contact_email'],
+            $res['contact_name'],
+            $res['contact_object'],
+            $res['contact_content'],
+            $res['contact_date'],
+            $res['contact_is_read']
         );
     }
 
-    public function updateConfig(int $captcha, ?string $email, ?string $mail = null): ?ContactSettingsEntity
+
+    /**
+     * @return \CMW\Entity\Pages\PageEntity[]
+     */
+    public function getMessages(#[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): array
     {
-        $info = array(
-            "captcha" => $captcha,
+
+        $sql = "select contact_id from cmw_contact";
+        $db = self::getInstance();
+
+        $res = $db->prepare($sql);
+
+        if (!$res->execute()) {
+            return array();
+        }
+
+        $toReturn = array();
+
+        while ($message = $res->fetch()) {
+            $toReturn[] = $this->getMessageById($message["contact_id"], $filter);
+        }
+
+        return $toReturn;
+    }
+
+    public function addMessage(string $email, string $name, string $object, string $content): ?ContactEntity
+    {
+        $var = array(
             "email" => $email,
-            "mail" => $mail,
+            "name" => $name,
+            "object" => $object,
+            "content" => $content,
         );
 
-        $sql = "UPDATE cmw_contact_settings SET contact_settings_captcha = :captcha, contact_settings_email = :email,
-                                contact_settings_mail_confirmation = :mail";
+        $sql = "INSERT INTO cmw_contact (contact_email, contact_name, contact_object, contact_content)
+                    VALUES (:email, :name, :object, :content)";
 
         $db = self::getInstance();
-        $req = $db->prepare($sql);
-        if ($req->execute($info)) {
-            return $this->getConfig();
+
+        $res = $db->prepare($sql);
+
+        if ($res->execute($var)) {
+            return $this->getMessageById($db->lastInsertId());
         }
 
         return null;
+    }
+
+    public function setMessageState(int $id): void
+    {
+        $sql = "UPDATE cmw_contact SET contact_is_read = 1 WHERE contact_id = :id";
+
+        $db = self::getInstance();
+
+        $res = $db->prepare($sql);
+        $res->execute(["id" => $id]);
     }
 
 }
