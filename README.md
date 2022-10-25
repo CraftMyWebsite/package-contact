@@ -1,2 +1,2 @@
-# pakage-contact
+# package-contact
 Package Contact pour CraftMyWebsite
