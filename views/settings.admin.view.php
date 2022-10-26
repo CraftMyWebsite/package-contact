@@ -38,12 +38,24 @@ $description = LangManager::translate("contact.settings.description");
                                 </div>
                             </div>
 
-                            <div class="form-check">
+                            <div class="form-check mt-4">
                                 <input type="checkbox" id="captcha" name="captcha" class="form-check-input"
                                         <?= $config->captchaIsEnable() ? 'checked' : '' ?>>
                                 <label for="captcha" class="form-check-label">
                                     <?= LangManager::translate("contact.settings.captcha_hint") ?>
                                 </label>
+                            </div>
+
+                            <div class="form-group mt-4">
+                                <label for="object"><?= LangManager::translate("contact.settings.object_confirmation") ?></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-object-group"></i></span>
+                                    </div>
+                                    <input type="text" id="object" name="object" class="form-control"
+                                           value="<?= $config->getObjectConfirmation() ?>"
+                                           placeholder="<?= LangManager::translate("contact.settings.object_confirmation_placeholder") ?>">
+                                </div>
                             </div>
 
                             <label for="summernote" class="mt-3">

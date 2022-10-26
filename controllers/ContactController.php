@@ -3,10 +3,12 @@
 namespace CMW\Controller\Contact;
 
 use CMW\Controller\Core\CoreController;
+use CMW\Controller\Core\MailController;
 use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
+use CMW\Model\Core\MailModel;
 use CMW\Router\Link;
 use CMW\Utils\Utils;
 use CMW\Utils\View;
@@ -53,9 +55,9 @@ class ContactController extends CoreController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
-        [$captcha, $email, $mail] = Utils::filterInput("captcha", "email", "mail");
+        [$captcha, $email, $object, $mail] = Utils::filterInput("captcha", "email", "object", "mail");
 
-        $this->contactSettingsModel->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $mail);
+        $this->contactSettingsModel->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $object, $mail);
 
         header("Location: settings");
     }
@@ -106,6 +108,10 @@ class ContactController extends CoreController
                 [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
                 $this->contactModel->addMessage($email, $name, $object, $content);
 
+                //Send mail confirmation
+                (new MailController())
+                    ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
+
                 //TODO TOASTER SUCCESS
 
                 header("Location: /");
@@ -113,6 +119,10 @@ class ContactController extends CoreController
         } else {
             [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
             $this->contactModel->addMessage($email, $name, $object, $content);
+
+            //Send mail confirmation
+            (new MailController())
+                ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
             //TODO TOASTER SUCCESS
 
