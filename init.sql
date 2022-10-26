@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `cmw_contact_settings`
 INSERT INTO cmw_contact_settings (contact_settings_captcha)
 VALUES (0);
 
-CREATE TABLE IF NOT EXISTS `cmw2`.`cmw_contact`
+CREATE TABLE IF NOT EXISTS `cmw_contact`
 (
     `contact_id`      INT          NOT NULL AUTO_INCREMENT,
     `contact_email`   VARCHAR(100) NOT NULL,
