@@ -2,11 +2,11 @@
   "name": "contact",
   "menus": [
     {
-      "name_menu": "Contact",
+      "name_menu_fr": "Contact",
       "name_menu_en": "Contact",
       "icon_menu": "fas fa-address-book",
       "url_menu": "",
-      "urls_submenu": {
+      "urls_submenu_fr": {
         "Paramètres": "contact/settings",
         "Historique": "contact/history",
         "Statistiques": "contact/stats"
@@ -18,7 +18,14 @@
       }
     }
   ],
-  "description": "Gérez vos formulaires de contact depuis votre site",
+
+  "description": [
+    {
+      "fr": "Gérez vos formulaires de contact depuis votre site",
+      "en": "Manage your form contact"
+    }
+  ],
+
   "version": "1.0.0",
   "author": "Teyir"
 }

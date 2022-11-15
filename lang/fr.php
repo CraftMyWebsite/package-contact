@@ -27,4 +27,10 @@ return [
         "description" => "Lisez un message",
         "informations" => "Informations",
     ],
+    "toaster" => [
+        "send" => [
+            "success" => "Message envoyé avec succès !",
+            "error-captcha" => "Merci de compléter le captcha"
+        ]
+    ]
 ];

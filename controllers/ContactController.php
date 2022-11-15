@@ -6,10 +6,11 @@ use CMW\Controller\Core\CoreController;
 use CMW\Controller\Core\MailController;
 use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
+use CMW\Manager\Lang\LangManager;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
-use CMW\Model\Core\MailModel;
 use CMW\Router\Link;
+use CMW\Utils\Response;
 use CMW\Utils\Utils;
 use CMW\Utils\View;
 
@@ -59,12 +60,16 @@ class ContactController extends CoreController
 
         $this->contactSettingsModel->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $object, $mail);
 
+        Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+            LangManager::translate("core.toaster.config.success"));
+
         header("Location: settings");
     }
 
     #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
     public function adminContactHistory(): void
     {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
         $messages = $this->contactModel->getMessages();
 
@@ -76,10 +81,11 @@ class ContactController extends CoreController
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
     public function adminContactRead(int $id): void
     {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
         $message = $this->contactModel->getMessageById($id);
 
-        if(!$message?->isRead()){
+        if (!$message?->isRead()) {
             $this->contactModel->setMessageState($id);
         }
 
@@ -112,9 +118,12 @@ class ContactController extends CoreController
                 (new MailController())
                     ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
-                //TODO TOASTER SUCCESS
+                Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+                    LangManager::translate("contact.toaster.send.success"));
 
-                header("Location: /");
+            } else {
+                Response::sendAlert("error", LangManager::translate("core.toaster.error"),
+                    LangManager::translate("contact.toaster.send.error-captcha"));
             }
         } else {
             [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
@@ -124,10 +133,11 @@ class ContactController extends CoreController
             (new MailController())
                 ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
-            //TODO TOASTER SUCCESS
+            Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+                LangManager::translate("contact.toaster.send.success"));
 
-            header("Location: /");
         }
+        header("Location: " . Utils::getEnv()->getValue("PATH_SUBFOLDER"));
 
     }
 
