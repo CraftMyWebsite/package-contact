@@ -18,8 +18,7 @@ class ContactModel extends DatabaseManager
     public function getMessageById(int $id, #[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): ?ContactEntity
     {
 
-        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content,
-                DATE_FORMAT(contact_date, '%d/%m/%Y à %H:%i:%s') AS 'contact_date', contact_is_read
+        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content, contact_date
                 FROM cmw_contact WHERE contact_id = :id";
 
         if ($filter === "READ") {
