@@ -137,7 +137,7 @@ class ContactController extends CoreController
                 LangManager::translate("contact.toaster.send.success"));
 
         }
-        header("Location: " . Utils::getEnv()->getValue("PATH_SUBFOLDER"));
+        header("location: " . $_SERVER['HTTP_REFERER']);
 
     }
 
