@@ -42,11 +42,8 @@ class ContactController extends CoreController
         $config = $this->contactSettingsModel->getConfig();
 
         View::createAdminView('contact', 'settings')
-            ->addScriptBefore("admin/resources/vendors/summernote/summernote.min.js",
-                "admin/resources/vendors/summernote/summernote-bs4.min.js",
-                "admin/resources/vendors/summernote/init.js")
-            ->addStyle("admin/resources/vendors/summernote/summernote-bs4.min.css",
-                "admin/resources/vendors/summernote/summernote.min.css")
+            ->addStyle("app/package/wiki/views/assets/css/main.css","admin/resources/vendors/summernote/summernote-lite.css","admin/resources/assets/css/pages/summernote.css")
+            ->addScriptAfter("admin/resources/vendors/jquery/jquery.min.js","admin/resources/vendors/summernote/summernote-lite.min.js","admin/resources/assets/js/pages/summernote.js")
             ->addVariableList(["config" => $config])
             ->view();
     }
@@ -74,6 +71,9 @@ class ContactController extends CoreController
         $messages = $this->contactModel->getMessages();
 
         View::createAdminView('contact', 'history')
+            ->addStyle("admin/resources/vendors/simple-datatables/style.css","admin/resources/assets/css/pages/simple-datatables.css")
+            ->addScriptAfter("app/package/contact/views/resources/js/simple-datatables.js",
+                "admin/resources/assets/js/pages/simple-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
     }
@@ -93,6 +93,17 @@ class ContactController extends CoreController
             ->addScriptAfter("app/package/contact/views/resources/js/main.js")
             ->addVariableList(["message" => $message])
             ->view();
+    }
+
+    #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    public function adminContactDelete(int $id): void
+    {
+        $this->contactModel->deleteMessage($id);
+
+        Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+            LangManager::translate("contact.toaster.delete.success"));
+
+        header("location: ../history");
     }
 
 
