@@ -18,8 +18,7 @@ class ContactModel extends DatabaseManager
     public function getMessageById(int $id, #[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): ?ContactEntity
     {
 
-        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content, contact_date
-                FROM cmw_contact WHERE contact_id = :id";
+        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content, contact_date, contact_is_read FROM cmw_contact WHERE contact_id = :id";
 
         if ($filter === "READ") {
             $sql .= "AND contact_is_read = 1";
@@ -55,7 +54,7 @@ class ContactModel extends DatabaseManager
     public function getMessages(#[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): array
     {
 
-        $sql = "select contact_id from cmw_contact";
+        $sql = "select contact_id from cmw_contact ORDER BY contact_date DESC";
         $db = self::getInstance();
 
         $res = $db->prepare($sql);
@@ -94,6 +93,15 @@ class ContactModel extends DatabaseManager
         }
 
         return null;
+    }
+
+    public function deleteMessage(int $id): void
+    {
+        $sql = "DELETE FROM cmw_contact WHERE contact_id=:id";
+
+        $db = self::getInstance();
+        $req = $db->prepare($sql);
+        $req->execute(array("id" => $id));
     }
 
     public function setMessageState(int $id): void
