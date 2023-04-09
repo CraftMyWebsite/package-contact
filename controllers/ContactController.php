@@ -98,6 +98,8 @@ class ContactController extends CoreController
     #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
     public function adminContactDelete(int $id): void
     {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
+
         $this->contactModel->deleteMessage($id);
 
         Response::sendAlert("success", LangManager::translate("core.toaster.success"),
