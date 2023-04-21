@@ -29,6 +29,9 @@ return [
         "title" => "Historique des messages",
         "description" => "Affichez la liste de vos messages reçus",
     ],
+    "button" => [
+        "download" => "Télécharger",
+    ],
     "read" => [
         "title" => "Lecture d'un message",
         "description" => "Lisez un message",

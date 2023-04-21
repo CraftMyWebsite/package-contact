@@ -29,6 +29,9 @@ return [
         "title" => "Message history",
         "description" => "View the list of your received messages",
     ],
+    "button" => [
+        "download" => "Download",
+    ],
     "read" => [
         "title" => "Reading a message",
         "description" => "Read a message",

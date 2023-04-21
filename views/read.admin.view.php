@@ -28,7 +28,7 @@ $description = LangManager::translate("contact.read.description"); ?>
             </div>
             <div class="card-footer text-center">
                 <button class="btn btn-success" onclick="print()">
-                    <?= LangManager::translate("core.btn.download") ?>
+                    <?= LangManager::translate("contact.button.download") ?>
                 </button>
             </div>
         </div>
