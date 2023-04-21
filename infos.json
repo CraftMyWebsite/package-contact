@@ -14,7 +14,7 @@
       "urls_submenu_en": {
         "Settings": "contact/settings",
         "History": "contact/history",
-        "Stats": "stats/add"
+        "Stats": "contact/stats"
       }
     }
   ],

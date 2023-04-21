@@ -2,6 +2,8 @@
 
 namespace CMW\Entity\Contact;
 
+use CMW\Controller\Core\CoreController;
+
 class ContactEntity
 {
 
@@ -78,7 +80,7 @@ class ContactEntity
      */
     public function getDate(): string
     {
-        return $this->date;
+        return CoreController::formatDate($this->date);
     }
 
     /**

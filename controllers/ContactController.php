@@ -13,6 +13,7 @@ use CMW\Router\Link;
 use CMW\Utils\Response;
 use CMW\Utils\Utils;
 use CMW\Manager\Views\View;
+use CMW\Utils\Redirect;
 
 /**
  * Class: @ContactController
@@ -60,7 +61,7 @@ class ContactController extends CoreController
         Response::sendAlert("success", LangManager::translate("core.toaster.success"),
             LangManager::translate("core.toaster.config.success"));
 
-        header("Location: settings");
+        Redirect::redirectToPreviousPage();
     }
 
     #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
