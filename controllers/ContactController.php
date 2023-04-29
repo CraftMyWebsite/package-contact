@@ -116,7 +116,7 @@ class ContactController extends CoreController
     #[Link("/", Link::GET, [], "/contact")]
     public function publicContact(): void
     {
-        View::basicPublicView("contact", "main");
+        View::basicPublicView("Contact", "main");
     }
 
     #[Link("/", Link::POST, [], "/contact")]
