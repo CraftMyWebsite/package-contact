@@ -7,6 +7,7 @@ use CMW\Controller\Core\MailController;
 use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
 use CMW\Manager\Lang\LangManager;
+use CMW\Manager\Requests\Request;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
 use CMW\Router\Link;
@@ -80,7 +81,7 @@ class ContactController extends CoreController
     }
 
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    public function adminContactRead(int $id): void
+    public function adminContactRead(Request $request, int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
@@ -97,7 +98,7 @@ class ContactController extends CoreController
     }
 
     #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    public function adminContactDelete(int $id): void
+    public function adminContactDelete(Request $request, int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
 
