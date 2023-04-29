@@ -11,7 +11,7 @@ $description = LangManager::translate("contact.read.description"); ?>
     <h3><i class="fa-solid fa-book-open"></i> <span class="m-lg-auto"><?= LangManager::translate("contact.read.title") ?></span></h3>
 </div>
 
-<a href="<?= Utils::getHttpProtocol() . '://' . $_SERVER['SERVER_NAME'] . getenv("PATH_SUBFOLDER") . "cmw-Admin/contact/history" ?>" class="btn btn-primary">
+<a href="<?= Utils::getHttpProtocol() . '://' . $_SERVER['SERVER_NAME'] . getenv("PATH_SUBFOLDER") . "cmw-admin/contact/history" ?>" class="btn btn-primary">
     <?= LangManager::translate("contact.read.back") ?>
 </a>
 

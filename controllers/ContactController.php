@@ -34,8 +34,8 @@ class ContactController extends CoreController
         $this->contactSettingsModel = new ContactSettingsModel();
     }
 
-    #[Link(path: "/", method: Link::GET, scope: "/cmw-Admin/contact")]
-    #[Link("/settings", Link::GET, [], "/cmw-Admin/contact")]
+    #[Link(path: "/", method: Link::GET, scope: "/cmw-admin/contact")]
+    #[Link("/settings", Link::GET, [], "/cmw-admin/contact")]
     public function adminContactSettings(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
@@ -49,7 +49,7 @@ class ContactController extends CoreController
             ->view();
     }
 
-    #[Link("/settings", Link::POST, [], "/cmw-Admin/contact")]
+    #[Link("/settings", Link::POST, [], "/cmw-admin/contact")]
     public function adminContactSettingsPost(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
@@ -64,7 +64,7 @@ class ContactController extends CoreController
         Redirect::redirectToPreviousPage();
     }
 
-    #[Link("/history", Link::GET, [], "/cmw-Admin/contact")]
+    #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
     public function adminContactHistory(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
@@ -79,7 +79,7 @@ class ContactController extends CoreController
             ->view();
     }
 
-    #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-Admin/contact")]
+    #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
     public function adminContactRead(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
@@ -96,7 +96,7 @@ class ContactController extends CoreController
             ->view();
     }
 
-    #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-Admin/contact")]
+    #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
     public function adminContactDelete(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
