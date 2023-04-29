@@ -34,8 +34,8 @@ class ContactController extends CoreController
         $this->contactSettingsModel = new ContactSettingsModel();
     }
 
-    #[Link(path: "/", method: Link::GET, scope: "/cmw-admin/contact")]
-    #[Link("/settings", Link::GET, [], "/cmw-admin/contact")]
+    #[Link(path: "/", method: Link::GET, scope: "/cmw-Admin/contact")]
+    #[Link("/settings", Link::GET, [], "/cmw-Admin/contact")]
     public function adminContactSettings(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
@@ -43,13 +43,13 @@ class ContactController extends CoreController
         $config = $this->contactSettingsModel->getConfig();
 
         View::createAdminView('contact', 'settings')
-            ->addStyle("app/package/wiki/views/assets/css/main.css","admin/resources/vendors/summernote/summernote-lite.css","admin/resources/assets/css/pages/summernote.css")
-            ->addScriptAfter("admin/resources/vendors/jquery/jquery.min.js","admin/resources/vendors/summernote/summernote-lite.min.js","admin/resources/assets/js/pages/summernote.js")
+            ->addStyle("App/Package/wiki/Views/Assets/Css/main.css","Admin/Resources/Vendors/Summernote/summernote-lite.css","Admin/Resources/Assets/Css/Pages/summernote.css")
+            ->addScriptAfter("Admin/Resources/Vendors/jquery/jquery.min.js","Admin/Resources/Vendors/Summernote/summernote-lite.min.js","Admin/Resources/Assets/Js/Pages/summernote.js")
             ->addVariableList(["config" => $config])
             ->view();
     }
 
-    #[Link("/settings", Link::POST, [], "/cmw-admin/contact")]
+    #[Link("/settings", Link::POST, [], "/cmw-Admin/contact")]
     public function adminContactSettingsPost(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
@@ -64,7 +64,7 @@ class ContactController extends CoreController
         Redirect::redirectToPreviousPage();
     }
 
-    #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
+    #[Link("/history", Link::GET, [], "/cmw-Admin/contact")]
     public function adminContactHistory(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
@@ -72,14 +72,14 @@ class ContactController extends CoreController
         $messages = $this->contactModel->getMessages();
 
         View::createAdminView('contact', 'history')
-            ->addStyle("admin/resources/vendors/simple-datatables/style.css","admin/resources/assets/css/pages/simple-datatables.css")
-            ->addScriptAfter("app/package/contact/views/resources/js/simple-datatables.js",
-                "admin/resources/assets/js/pages/simple-datatables.js")
+            ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css","Admin/Resources/Assets/Css/Pages/simple-datatables.css")
+            ->addScriptAfter("App/Package/contact/Views/Resources/Js/simple-datatables.js",
+                "Admin/Resources/Assets/Js/Pages/simple-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
     }
 
-    #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-Admin/contact")]
     public function adminContactRead(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
@@ -91,12 +91,12 @@ class ContactController extends CoreController
         }
 
         View::createAdminView('contact', 'read')
-            ->addScriptAfter("app/package/contact/views/resources/js/main.js")
+            ->addScriptAfter("App/Package/contact/Views/Resources/Js/main.js")
             ->addVariableList(["message" => $message])
             ->view();
     }
 
-    #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-Admin/contact")]
     public function adminContactDelete(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
