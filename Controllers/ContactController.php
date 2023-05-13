@@ -82,7 +82,7 @@ class ContactController extends AbstractController
         }
 
         View::createAdminView('Contact', 'read')
-            ->addScriptAfter("App/Package/Contact/Views/Resources/Js/main.js")
+            ->addScriptAfter("App/Package/Contact/Views/Resources/Js/print.js")
             ->addVariableList(["message" => $message])
             ->view();
     }
