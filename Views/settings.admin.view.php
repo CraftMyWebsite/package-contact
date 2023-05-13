@@ -45,7 +45,7 @@ $description = LangManager::translate("contact.settings.description");
                     <label class="form-check-label" for="captcha"><?= LangManager::translate("contact.settings.captcha_hint") ?></label>
                 </div>
                 <h6 class="mt-2"><?= LangManager::translate("contact.settings.mail_confirmation") ?> :</h6>
-                <textarea name="mail" id="summernote-1" required><?= $config->getMailConfirmation() ?></textarea>
+                <textarea name="mail" class="tinymce"><?= $config->getMailConfirmation() ?></textarea>
                 <div class="text-center mt-2">
                     <button type="submit" class="btn btn-primary"><?= LangManager::translate("core.btn.save", lineBreak: true) ?></button>
                 </div>

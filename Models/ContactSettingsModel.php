@@ -4,6 +4,7 @@ namespace CMW\Model\Contact;
 
 use CMW\Entity\Contact\ContactSettingsEntity;
 use CMW\Manager\Database\DatabaseManager;
+use CMW\Manager\Package\AbstractModel;
 
 /**
  * Class: @ContactSettingsModel
@@ -11,14 +12,14 @@ use CMW\Manager\Database\DatabaseManager;
  * @author Teyir
  * @version 1.0
  */
-class ContactSettingsModel extends DatabaseManager
+class ContactSettingsModel extends AbstractModel
 {
 
     public function getConfig(): ?ContactSettingsEntity
     {
         $sql = "SELECT * FROM cmw_contact_settings LIMIT 1";
 
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
         $res = $db->prepare($sql);
 
 
@@ -48,7 +49,7 @@ class ContactSettingsModel extends DatabaseManager
         $sql = "UPDATE cmw_contact_settings SET contact_settings_captcha = :captcha, contact_settings_email = :email,
                         contact_settings_object_confirmation = :object, contact_settings_mail_confirmation = :mail";
 
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
         $req = $db->prepare($sql);
         if ($req->execute($info)) {
             return $this->getConfig();

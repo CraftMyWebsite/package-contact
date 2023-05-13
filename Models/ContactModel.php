@@ -4,6 +4,7 @@ namespace CMW\Model\Contact;
 
 use CMW\Entity\Contact\ContactEntity;
 use CMW\Manager\Database\DatabaseManager;
+use CMW\Manager\Package\AbstractModel;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /**
@@ -12,7 +13,7 @@ use JetBrains\PhpStorm\ExpectedValues;
  * @author Teyir
  * @version 1.0
  */
-class ContactModel extends DatabaseManager
+class ContactModel extends AbstractModel
 {
 
     public function getMessageById(int $id, #[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): ?ContactEntity
@@ -26,7 +27,7 @@ class ContactModel extends DatabaseManager
             $sql .= "AND contact_is_read = 0";
         }
 
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
 
@@ -55,7 +56,7 @@ class ContactModel extends DatabaseManager
     {
 
         $sql = "select contact_id from cmw_contact ORDER BY contact_date DESC";
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
 
@@ -84,7 +85,7 @@ class ContactModel extends DatabaseManager
         $sql = "INSERT INTO cmw_contact (contact_email, contact_name, contact_object, contact_content)
                     VALUES (:email, :name, :object, :content)";
 
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
 
@@ -99,7 +100,7 @@ class ContactModel extends DatabaseManager
     {
         $sql = "DELETE FROM cmw_contact WHERE contact_id=:id";
 
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
         $req = $db->prepare($sql);
         $req->execute(array("id" => $id));
     }
@@ -108,7 +109,7 @@ class ContactModel extends DatabaseManager
     {
         $sql = "UPDATE cmw_contact SET contact_is_read = 1 WHERE contact_id = :id";
 
-        $db = self::getInstance();
+        $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
         $res->execute(["id" => $id]);

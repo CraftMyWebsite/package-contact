@@ -2,16 +2,17 @@
 
 namespace CMW\Controller\Contact;
 
-use CMW\Controller\Core\CoreController;
 use CMW\Controller\Core\MailController;
 use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
+use CMW\Manager\Flash\Alert;
+use CMW\Manager\Flash\Flash;
 use CMW\Manager\Lang\LangManager;
+use CMW\Manager\Package\AbstractController;
 use CMW\Manager\Requests\Request;
+use CMW\Manager\Router\Link;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
-use CMW\Router\Link;
-use CMW\Utils\Response;
 use CMW\Utils\Utils;
 use CMW\Manager\Views\View;
 use CMW\Utils\Redirect;
@@ -22,30 +23,19 @@ use CMW\Utils\Redirect;
  * @author Teyir
  * @version 1.0
  */
-class ContactController extends CoreController
+class ContactController extends AbstractController
 {
-
-    private ContactModel $contactModel;
-    private ContactSettingsModel $contactSettingsModel;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->contactModel = new ContactModel();
-        $this->contactSettingsModel = new ContactSettingsModel();
-    }
-
     #[Link(path: "/", method: Link::GET, scope: "/cmw-admin/contact")]
     #[Link("/settings", Link::GET, [], "/cmw-admin/contact")]
     public function adminContactSettings(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
-        $config = $this->contactSettingsModel->getConfig();
+        $config = contactSettingsModel::getInstance()->getConfig();
 
-        View::createAdminView('contact', 'settings')
-            ->addStyle("App/Package/wiki/Views/Assets/Css/main.css","Admin/Resources/Vendors/Summernote/summernote-lite.css","Admin/Resources/Assets/Css/Pages/summernote.css")
-            ->addScriptAfter("Admin/Resources/Vendors/jquery/jquery.min.js","Admin/Resources/Vendors/Summernote/summernote-lite.min.js","Admin/Resources/Assets/Js/Pages/summernote.js")
+        View::createAdminView('Contact', 'settings')
+            ->addScriptBefore("Admin/Resources/Vendors/Tinymce/tinymce.min.js",
+                "Admin/Resources/Vendors/Tinymce/Config/full.js")
             ->addVariableList(["config" => $config])
             ->view();
     }
@@ -57,12 +47,12 @@ class ContactController extends CoreController
 
         [$captcha, $email, $object, $mail] = Utils::filterInput("captcha", "email", "object", "mail");
 
-        $this->contactSettingsModel->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $object, $mail);
+        contactSettingsModel::getInstance()->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $object, $mail);
 
-        Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+        Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("core.toaster.config.success"));
 
-        Redirect::redirectToPreviousPage();
+        Redirect::redirectPreviousRoute();
     }
 
     #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
@@ -70,11 +60,11 @@ class ContactController extends CoreController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
-        $messages = $this->contactModel->getMessages();
+        $messages = contactModel::getInstance()->getMessages();
 
-        View::createAdminView('contact', 'history')
+        View::createAdminView('Contact', 'history')
             ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css","Admin/Resources/Assets/Css/Pages/simple-datatables.css")
-            ->addScriptAfter("App/Package/contact/Views/Resources/Js/simple-datatables.js",
+            ->addScriptAfter("Admin/Resources/Vendors/Simple-datatables/Umd/simple-datatables.js",
                 "Admin/Resources/Assets/Js/Pages/simple-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
@@ -85,14 +75,14 @@ class ContactController extends CoreController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
-        $message = $this->contactModel->getMessageById($id);
+        $message = contactModel::getInstance()->getMessageById($id);
 
         if (!$message?->isRead()) {
-            $this->contactModel->setMessageState($id);
+            contactModel::getInstance()->setMessageState($id);
         }
 
-        View::createAdminView('contact', 'read')
-            ->addScriptAfter("App/Package/contact/Views/Resources/Js/main.js")
+        View::createAdminView('Contact', 'read')
+            ->addScriptAfter("App/Package/Contact/Views/Resources/Js/print.js")
             ->addVariableList(["message" => $message])
             ->view();
     }
@@ -102,12 +92,12 @@ class ContactController extends CoreController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
 
-        $this->contactModel->deleteMessage($id);
+        contactModel::getInstance()->deleteMessage($id);
 
-        Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+        Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("contact.toaster.delete.success"));
 
-        header("location: ../history");
+        Redirect::redirectPreviousRoute();
     }
 
 
@@ -122,38 +112,37 @@ class ContactController extends CoreController
     #[Link("/", Link::POST, [], "/contact")]
     public function publicContactPost(): void
     {
-        $config = $this->contactSettingsModel->getConfig();
+        $config = contactSettingsModel::getInstance()->getConfig();
 
         if ($config?->captchaIsEnable()) {
             if (SecurityController::checkCaptcha()) {
                 [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
-                $this->contactModel->addMessage($email, $name, $object, $content);
+                contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
                 //Send mail confirmation
                 (new MailController())
                     ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
-                Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                     LangManager::translate("contact.toaster.send.success"));
 
             } else {
-                Response::sendAlert("error", LangManager::translate("core.toaster.error"),
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.error"),
                     LangManager::translate("contact.toaster.send.error-captcha"));
             }
         } else {
             [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
-            $this->contactModel->addMessage($email, $name, $object, $content);
+            contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
             //Send mail confirmation
             (new MailController())
                 ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
-            Response::sendAlert("success", LangManager::translate("core.toaster.success"),
+            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                 LangManager::translate("contact.toaster.send.success"));
 
         }
-        header("location: " . $_SERVER['HTTP_REFERER']);
-
+        Redirect::redirectPreviousRoute();
     }
 
 }
