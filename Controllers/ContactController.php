@@ -64,7 +64,7 @@ class ContactController extends AbstractController
 
         View::createAdminView('Contact', 'history')
             ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css","Admin/Resources/Assets/Css/Pages/simple-datatables.css")
-            ->addScriptAfter("App/Package/Contact/Views/Resources/Js/simple-datatables.js",
+            ->addScriptAfter("Admin/Resources/Vendors/Simple-datatables/Umd/simple-datatables.js",
                 "Admin/Resources/Assets/Js/Pages/simple-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
