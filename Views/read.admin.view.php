@@ -1,7 +1,9 @@
 <?php
 
+use CMW\Manager\Env\EnvManager;
 use CMW\Manager\Lang\LangManager;
-use CMW\Utils\Utils;
+use CMW\Utils\Website;
+
 /* @var \CMW\Entity\Contact\ContactEntity $message */
 
 $title = LangManager::translate("contact.read.title");
@@ -11,7 +13,7 @@ $description = LangManager::translate("contact.read.description"); ?>
     <h3><i class="fa-solid fa-book-open"></i> <span class="m-lg-auto"><?= LangManager::translate("contact.read.title") ?></span></h3>
 </div>
 
-<a href="<?= Utils::getHttpProtocol() . '://' . $_SERVER['SERVER_NAME'] . getenv("PATH_SUBFOLDER") . "cmw-admin/contact/history" ?>" class="btn btn-primary">
+<a href="<?= Website::getProtocol() . '://' . $_SERVER['SERVER_NAME'] . EnvManager::getInstance()->getValue("PATH_SUBFOLDER") . "cmw-admin/contact/history" ?>" class="btn btn-primary">
     <?= LangManager::translate("contact.read.back") ?>
 </a>
 
