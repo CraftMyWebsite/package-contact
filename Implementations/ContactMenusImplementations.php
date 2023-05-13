@@ -3,13 +3,14 @@
 namespace CMW\Implementation\Contact;
 
 use CMW\Interface\Core\IMenus;
+use CMW\Manager\Lang\LangManager;
 
 class ContactMenusImplementations implements IMenus {
 
     public function getRoutes(): array
     {
         return [
-            'contact'
+            LangManager::translate('contact.contact') => 'contact'
         ];
     }
 

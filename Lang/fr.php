@@ -1,6 +1,7 @@
 <?php
 
 return [
+    "contact" => "Contact",
     "settings" => [
         "title" => "Paramètres contact",
         "description" => "Gérez les paramètres de vos formulaires de contact",

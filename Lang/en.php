@@ -1,6 +1,7 @@
 <?php
 
 return [
+    "contact" => "Contact",
     "settings" => [
         "title" => "Contact settings",
         "description" => "Manage your contact form settings",
