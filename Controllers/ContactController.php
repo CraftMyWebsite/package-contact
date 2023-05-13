@@ -5,6 +5,7 @@ namespace CMW\Controller\Contact;
 use CMW\Controller\Core\MailController;
 use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
+use CMW\Manager\Flash\Alert;
 use CMW\Manager\Flash\Flash;
 use CMW\Manager\Lang\LangManager;
 use CMW\Manager\Package\AbstractController;
@@ -33,8 +34,8 @@ class ContactController extends AbstractController
         $config = contactSettingsModel::getInstance()->getConfig();
 
         View::createAdminView('Contact', 'settings')
-            ->addStyle("App/Package/wiki/Views/Assets/Css/main.css","Admin/Resources/Vendors/Summernote/summernote-lite.css","Admin/Resources/Assets/Css/Pages/summernote.css")
-            ->addScriptAfter("Admin/Resources/Vendors/jquery/jquery.min.js","Admin/Resources/Vendors/Summernote/summernote-lite.min.js","Admin/Resources/Assets/Js/Pages/summernote.js")
+            ->addScriptBefore("Admin/Resources/Vendors/Tinymce/tinymce.min.js",
+                "Admin/Resources/Vendors/Tinymce/Config/full.js")
             ->addVariableList(["config" => $config])
             ->view();
     }
@@ -48,10 +49,10 @@ class ContactController extends AbstractController
 
         contactSettingsModel::getInstance()->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $object, $mail);
 
-        Flash::send("success", LangManager::translate("core.toaster.success"),
+        Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("core.toaster.config.success"));
 
-        Redirect::redirectToPreviousPage();
+        Redirect::redirectPreviousRoute();
     }
 
     #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
@@ -63,7 +64,7 @@ class ContactController extends AbstractController
 
         View::createAdminView('Contact', 'history')
             ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css","Admin/Resources/Assets/Css/Pages/simple-datatables.css")
-            ->addScriptAfter("App/Package/contact/Views/Resources/Js/simple-datatables.js",
+            ->addScriptAfter("App/Package/Contact/Views/Resources/Js/simple-datatables.js",
                 "Admin/Resources/Assets/Js/Pages/simple-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
@@ -81,7 +82,7 @@ class ContactController extends AbstractController
         }
 
         View::createAdminView('Contact', 'read')
-            ->addScriptAfter("App/Package/contact/Views/Resources/Js/main.js")
+            ->addScriptAfter("App/Package/Contact/Views/Resources/Js/main.js")
             ->addVariableList(["message" => $message])
             ->view();
     }
@@ -93,10 +94,10 @@ class ContactController extends AbstractController
 
         contactModel::getInstance()->deleteMessage($id);
 
-        Flash::send("success", LangManager::translate("core.toaster.success"),
+        Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("contact.toaster.delete.success"));
 
-        header("location: ../history");
+        Redirect::redirectPreviousRoute();
     }
 
 
@@ -122,11 +123,11 @@ class ContactController extends AbstractController
                 (new MailController())
                     ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
-                Flash::send("success", LangManager::translate("core.toaster.success"),
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                     LangManager::translate("contact.toaster.send.success"));
 
             } else {
-                Flash::send("error", LangManager::translate("core.toaster.error"),
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.error"),
                     LangManager::translate("contact.toaster.send.error-captcha"));
             }
         } else {
@@ -137,12 +138,11 @@ class ContactController extends AbstractController
             (new MailController())
                 ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
 
-            Flash::send("success", LangManager::translate("core.toaster.success"),
+            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                 LangManager::translate("contact.toaster.send.success"));
 
         }
-        header("location: " . $_SERVER['HTTP_REFERER']);
-
+        Redirect::redirectPreviousRoute();
     }
 
 }
