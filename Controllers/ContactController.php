@@ -100,6 +100,15 @@ class ContactController extends AbstractController
         Redirect::redirectPreviousRoute();
     }
 
+    #[Link("/stats", Link::GET, [], "/cmw-admin/contact")]
+    private function adminContactStats(): void
+    {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.stats");
+
+        View::createAdminView('Contact', 'stats')
+            ->view();
+    }
+
 
     /* PUBLIC AREA */
 
