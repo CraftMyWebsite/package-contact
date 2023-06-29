@@ -26,6 +26,13 @@ return [
         "deletetitle" => "Voulez-vous supprimer ce message ?",
         "deletealert" => "La suppression de ce message est définitive !<br>Aucun retour possible !",
     ],
+    "mail" => [
+        "object" => " Formulaire de contact",
+        "mail" => "Mail: ",
+        "name" => "<br>Nom: ",
+        "object_sender" => "<br>Objet: ",
+        "content" => "<br>Contenue: ",
+    ],
     "history" => [
         "title" => "Historique des messages",
         "description" => "Affichez la liste de vos messages reçus",

@@ -16,6 +16,7 @@ use CMW\Model\Contact\ContactSettingsModel;
 use CMW\Utils\Utils;
 use CMW\Manager\Views\View;
 use CMW\Utils\Redirect;
+use CMW\Utils\Website;
 
 /**
  * Class: @ContactController
@@ -129,8 +130,8 @@ class ContactController extends AbstractController
                 contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
                 //Send mail confirmation
-                (new MailController())
-                    ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
+                (new MailController())->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
+                (new MailController())->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
 
                 Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                     LangManager::translate("contact.toaster.send.success"));
@@ -144,8 +145,8 @@ class ContactController extends AbstractController
             contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
             //Send mail confirmation
-            (new MailController())
-                ->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
+            (new MailController())->sendMail($config->getEmail() .",".$email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
+            (new MailController())->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
 
             Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                 LangManager::translate("contact.toaster.send.success"));

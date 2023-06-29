@@ -26,6 +26,13 @@ return [
         "deletetitle" => "Do you want to delete this message?",
         "deletealert" => "Deletion of this message is permanent !<br>No return possible !",
     ],
+    "mail" => [
+        "object" => " Contact form",
+        "mail" => "Mail: ",
+        "name" => "<br>Name: ",
+        "object_sender" => "<br>Object: ",
+        "content" => "<br>Content: ",
+    ],
     "history" => [
         "title" => "Message history",
         "description" => "View the list of your received messages",
