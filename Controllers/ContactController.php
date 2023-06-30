@@ -17,6 +17,7 @@ use CMW\Utils\Utils;
 use CMW\Manager\Views\View;
 use CMW\Utils\Redirect;
 use CMW\Utils\Website;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Class: @ContactController
@@ -28,7 +29,7 @@ class ContactController extends AbstractController
 {
     #[Link(path: "/", method: Link::GET, scope: "/cmw-admin/contact")]
     #[Link("/settings", Link::GET, [], "/cmw-admin/contact")]
-    public function adminContactSettings(): void
+    private function adminContactSettings(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
@@ -42,7 +43,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/settings", Link::POST, [], "/cmw-admin/contact")]
-    public function adminContactSettingsPost(): void
+    private function adminContactSettingsPost(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
@@ -57,7 +58,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/history", Link::GET, [], "/cmw-admin/contact")]
-    public function adminContactHistory(): void
+    private function adminContactHistory(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
@@ -72,7 +73,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    public function adminContactRead(Request $request, int $id): void
+    private function adminContactRead(Request $request, int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
@@ -89,7 +90,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    public function adminContactDelete(Request $request, int $id): void
+    private function adminContactDelete(Request $request, int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
 
@@ -114,24 +115,37 @@ class ContactController extends AbstractController
     /* PUBLIC AREA */
 
     #[Link("/", Link::GET, [], "/contact")]
-    public function publicContact(): void
+    private function publicContact(): void
     {
         View::basicPublicView("Contact", "main");
     }
 
-    #[Link("/", Link::POST, [], "/contact")]
-    public function publicContactPost(): void
+    #[NoReturn] #[Link("/", Link::POST, [], "/contact")]
+    private function publicContactPost(): void
     {
         $config = contactSettingsModel::getInstance()->getConfig();
 
-        if ($config?->captchaIsEnable()) {
+        if ($config === null || $config->getEmail() === null){
+            Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
+                LangManager::translate('contact.toaster.error.notConfigured'));
+            Redirect::redirectPreviousRoute();
+        }
+
+        if ($config->captchaIsEnable()) {
             if (SecurityController::checkCaptcha()) {
                 [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
+
+                if (Utils::containsNullValue($email, $name, $object, $content)){
+                    Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
+                        LangManager::translate('contact.toaster.send.errorFillFields'));
+                    Redirect::redirectPreviousRoute();
+                }
+
                 contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
                 //Send mail confirmation
-                (new MailController())->sendMail($email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
-                (new MailController())->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
+                MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
+                MailController::getInstance()->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
 
                 Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                     LangManager::translate("contact.toaster.send.success"));
@@ -142,11 +156,18 @@ class ContactController extends AbstractController
             }
         } else {
             [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
+
+            if (Utils::containsNullValue($email, $name, $object, $content)){
+                Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
+                    LangManager::translate('contact.toaster.send.errorFillFields'));
+                Redirect::redirectPreviousRoute();
+            }
+
             contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
             //Send mail confirmation
-            (new MailController())->sendMail($config->getEmail() .",".$email, $config?->getObjectConfirmation(), $config?->getMailConfirmation());
-            (new MailController())->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
+            MailController::getInstance()->sendMail($config->getEmail() .",".$email, $config->getObjectConfirmation(), $config->getMailConfirmation());
+            MailController::getInstance()->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
 
             Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                 LangManager::translate("contact.toaster.send.success"));

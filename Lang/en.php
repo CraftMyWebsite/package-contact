@@ -50,10 +50,14 @@ return [
     "toaster" => [
         "send" => [
             "success" => "Message sent successfully !",
-            "error-captcha" => "Please complete the captcha."
+            "error-captcha" => "Please complete the captcha.",
+            "errorFillFields" => "Please fill all inputs",
         ],
         "delete" => [
             "success" => "Message deleted !",
-        ]
-    ]
+        ],
+        "error" => [
+            "notConfigured" => "Please configure your Contact package."
+        ],
+    ],
 ];

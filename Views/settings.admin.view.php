@@ -18,13 +18,13 @@ $description = LangManager::translate("contact.settings.description");
         <div class="card-header">
         </div>
         <div class="card-body">
-            <form action="" method="post" enctype="multipart/form-data">
+            <form action="" method="post">
                     <?php (new SecurityManager())->insertHiddenToken() ?>
                     <div class="row">
                         <div class="col-12 col-lg-6">
                             <h6><?= LangManager::translate("contact.settings.email") ?> :</h6>
                             <div class="form-group position-relative has-icon-left">
-                                <input required type="text" class="form-control" type="email" id="email" name="email" required placeholder="<?= LangManager::translate("users.users.mail") ?>" maxlength="255" value="<?= $config->getEmail() ?>">
+                                <input class="form-control" type="email" id="email" name="email" required placeholder="<?= LangManager::translate("users.users.mail") ?>" maxlength="255" value="<?= $config->getEmail() ?>">
                                 <div class="form-control-icon">
                                     <i class="fas fa-envelope"></i>
                                 </div>
@@ -33,7 +33,7 @@ $description = LangManager::translate("contact.settings.description");
                         <div class="col-12 col-lg-6">
                             <h6><?= LangManager::translate("contact.settings.object_confirmation") ?> :</h6>
                             <div class="form-group position-relative has-icon-left">
-                                <input required type="text" class="form-control" type="text" id="object" name="object" required value="<?= $config->getObjectConfirmation() ?>" placeholder="<?= LangManager::translate("contact.settings.object_confirmation_placeholder") ?>" maxlength="255">
+                                <input class="form-control" type="text" id="object" name="object" required value="<?= $config->getObjectConfirmation() ?>" placeholder="<?= LangManager::translate("contact.settings.object_confirmation_placeholder") ?>" maxlength="255">
                                 <div class="form-control-icon">
                                     <i class="fas fa-object-group"></i>
                                 </div>
