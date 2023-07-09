@@ -145,7 +145,7 @@ class ContactController extends AbstractController
 
                 //Send mail confirmation
                 MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
-                MailController::getInstance()->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
+                MailController::getInstance()->sendMail($config->getEmail(), "[".Website::getWebsiteName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
 
                 Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                     LangManager::translate("contact.toaster.send.success"));
@@ -167,7 +167,7 @@ class ContactController extends AbstractController
 
             //Send mail confirmation
             MailController::getInstance()->sendMail($config->getEmail() .",".$email, $config->getObjectConfirmation(), $config->getMailConfirmation());
-            MailController::getInstance()->sendMail($config->getEmail(), "[".Website::getName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
+            MailController::getInstance()->sendMail($config->getEmail(), "[".Website::getWebsiteName()."]".LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail").$email.LangManager::translate("contact.mail.name").$name.LangManager::translate("contact.mail.object_sender").$object.LangManager::translate("contact.mail.content").$content);
 
             Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                 LangManager::translate("contact.toaster.send.success"));
