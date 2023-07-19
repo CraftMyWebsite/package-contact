@@ -1,15 +1,11 @@
 CREATE TABLE IF NOT EXISTS `cmw_contact_settings`
 (
-    `contact_settings_captcha`             TINYINT      NOT NULL,
     `contact_settings_email`               VARCHAR(100) NULL,
     `contact_settings_object_confirmation` VARCHAR(255) NULL,
     `contact_settings_mail_confirmation`   MEDIUMTEXT   NULL
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-
-INSERT INTO cmw_contact_settings (contact_settings_captcha)
-VALUES (0);
 
 CREATE TABLE IF NOT EXISTS `cmw_contact`
 (

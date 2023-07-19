@@ -30,23 +30,21 @@ class ContactSettingsModel extends AbstractModel
         $res = $res->fetch();
 
         return new ContactSettingsEntity(
-            $res['contact_settings_captcha'],
             $res['contact_settings_email'],
             $res['contact_settings_object_confirmation'],
             $res['contact_settings_mail_confirmation']
         );
     }
 
-    public function updateConfig(int $captcha, ?string $email, ?string $object = null, ?string $mail = null): ?ContactSettingsEntity
+    public function updateConfig(?string $email, ?string $object = null, ?string $mail = null): ?ContactSettingsEntity
     {
         $info = array(
-            "captcha" => $captcha,
             "email" => $email,
             "object" => $object,
             "mail" => $mail,
         );
 
-        $sql = "UPDATE cmw_contact_settings SET contact_settings_captcha = :captcha, contact_settings_email = :email,
+        $sql = "UPDATE cmw_contact_settings SET contact_settings_email = :email,
                         contact_settings_object_confirmation = :object, contact_settings_mail_confirmation = :mail";
 
         $db = DatabaseManager::getInstance();

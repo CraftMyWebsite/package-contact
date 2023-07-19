@@ -47,9 +47,9 @@ class ContactController extends AbstractController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
-        [$captcha, $email, $object, $mail] = Utils::filterInput("captcha", "email", "object", "mail");
+        [$email, $object, $mail] = Utils::filterInput("email", "object", "mail");
 
-        contactSettingsModel::getInstance()->updateConfig($captcha === NULL ? 0 : 1, $email ?? null, $object, $mail);
+        contactSettingsModel::getInstance()->updateConfig($email ?? null, $object, $mail);
 
         Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("core.toaster.config.success"));
@@ -120,76 +120,37 @@ class ContactController extends AbstractController
         View::basicPublicView("Contact", "main");
     }
 
-    private function contentFilter($content) {
-        $bannedWords = array("porn","porno","sex","sexy","spamm","spam","oportunity", "x","xx","xxx","vip");
-        foreach ($bannedWords as $word){
-            if (str_contains($content, $word)) return true;
-        }
-        return false;
-    }
-
-    private function emailFilter($email) {
-        $bannedWords = array("yopmail", "mailinator", "jetable", "0box", "contbay", "damnthespam", "kurzepost","objectmail","poxymail","rcpt","trash-mail","trashmail","wegwerfmail","tempmail","guerrillamail","10minutemail", "emailfake", "ru");
-        foreach ($bannedWords as $word){
-            if (str_contains($email, $word)) return true;
-        }
-        return false;
-    }
 
     #[NoReturn] #[Link("/", Link::POST, [], "/contact")]
     private function publicContactPost(): void
     {
         [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
 
-        if ($this->contentFilter($content) || $this->emailFilter($email)) {
-            Flash::send(Alert::ERROR, "AntiSpamm", "Votre formulaire ne répond pas à notre filtre anti-spamm");
-        } else {
-            $config = contactSettingsModel::getInstance()->getConfig();
+        $config = contactSettingsModel::getInstance()->getConfig();
 
-            if ($config === null || $config->getEmail() === null) {
+        if ($config === null || $config->getEmail() === null) {
+            Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
+                LangManager::translate('contact.toaster.error.notConfigured'));
+            Redirect::redirectPreviousRoute();
+        }
+        if (SecurityController::checkCaptcha()) {
+
+            if (Utils::containsNullValue($email, $name, $object, $content)) {
                 Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
-                    LangManager::translate('contact.toaster.error.notConfigured'));
+                    LangManager::translate('contact.toaster.send.errorFillFields'));
                 Redirect::redirectPreviousRoute();
             }
 
-            if ($config->captchaIsEnable()) {
-                if (SecurityController::checkCaptcha()) {
+            contactModel::getInstance()->addMessage($email, $name, $object, $content);
 
-                    if (Utils::containsNullValue($email, $name, $object, $content)) {
-                        Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
-                            LangManager::translate('contact.toaster.send.errorFillFields'));
-                        Redirect::redirectPreviousRoute();
-                    }
+            MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
+            MailController::getInstance()->sendMail($config->getEmail(), "[" . Website::getWebsiteName() . "]" . LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail") . $email . LangManager::translate("contact.mail.name") . $name . LangManager::translate("contact.mail.object_sender") . $object . LangManager::translate("contact.mail.content") . $content);
 
-                    contactModel::getInstance()->addMessage($email, $name, $object, $content);
-
-                    //Send mail confirmation
-                    MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
-                    MailController::getInstance()->sendMail($config->getEmail(), "[" . Website::getWebsiteName() . "]" . LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail") . $email . LangManager::translate("contact.mail.name") . $name . LangManager::translate("contact.mail.object_sender") . $object . LangManager::translate("contact.mail.content") . $content);
-
-                    Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
-                        LangManager::translate("contact.toaster.send.success"));
-                } else {
-                    Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.error"),
-                        LangManager::translate("contact.toaster.send.error-captcha"));
-                }
-            } else {
-                if (Utils::containsNullValue($email, $name, $object, $content)) {
-                    Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
-                        LangManager::translate('contact.toaster.send.errorFillFields'));
-                    Redirect::redirectPreviousRoute();
-                }
-
-                contactModel::getInstance()->addMessage($email, $name, $object, $content);
-
-                //Send mail confirmation
-                MailController::getInstance()->sendMail($config->getEmail() . "," . $email, $config->getObjectConfirmation(), $config->getMailConfirmation());
-                MailController::getInstance()->sendMail($config->getEmail(), "[" . Website::getWebsiteName() . "]" . LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail") . $email . LangManager::translate("contact.mail.name") . $name . LangManager::translate("contact.mail.object_sender") . $object . LangManager::translate("contact.mail.content") . $content);
-
-                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
-                    LangManager::translate("contact.toaster.send.success"));
-
-            }
+            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
+                LangManager::translate("contact.toaster.send.success"));
+        } else {
+            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.error"),
+                LangManager::translate("contact.toaster.send.error-captcha"));
         }
         Redirect::redirectPreviousRoute();
     }

@@ -40,10 +40,6 @@ $description = LangManager::translate("contact.settings.description");
                             </div>
                         </div>     
                     </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="captcha" name="captcha" <?= $config->captchaIsEnable() ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="captcha"><?= LangManager::translate("contact.settings.captcha_hint") ?></label>
-                </div>
                 <h6 class="mt-2"><?= LangManager::translate("contact.settings.mail_confirmation") ?> :</h6>
                 <textarea name="mail" class="tinymce"><?= $config->getMailConfirmation() ?></textarea>
                 <div class="text-center mt-2">
