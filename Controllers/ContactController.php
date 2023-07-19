@@ -149,7 +149,7 @@ class ContactController extends AbstractController
             Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
                 LangManager::translate("contact.toaster.send.success"));
         } else {
-            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.error"),
+            Flash::send(Alert::ERROR, LangManager::translate("core.toaster.error"),
                 LangManager::translate("contact.toaster.send.error-captcha"));
         }
         Redirect::redirectPreviousRoute();
