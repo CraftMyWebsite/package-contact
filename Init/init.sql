@@ -20,3 +20,6 @@ CREATE TABLE IF NOT EXISTS `cmw_contact`
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+
+INSERT INTO `cmw_contact_settings` (`contact_settings_email`, `contact_settings_object_confirmation`, `contact_settings_mail_confirmation`) VALUES (NULL, NULL, NULL);
