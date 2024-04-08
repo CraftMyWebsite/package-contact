@@ -37,7 +37,7 @@ class ContactController extends AbstractController
 
         View::createAdminView('Contact', 'settings')
             ->addScriptBefore("Admin/Resources/Vendors/Tinymce/tinymce.min.js",
-                "Admin/Resources/Vendors/Tinymce/Config/full.js")
+                "Admin/Resources/Vendors/Tinymce/Config/full_absolute_links.js")
             ->addVariableList(["config" => $config])
             ->view();
     }
