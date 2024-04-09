@@ -19,7 +19,7 @@ class ContactModel extends AbstractModel
     public function getMessageById(int $id, #[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): ?ContactEntity
     {
 
-        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content, contact_date, contact_is_read FROM cmw_contact WHERE contact_id = :id";
+        $sql = "SELECT contact_id, contact_email, contact_name, contact_object, contact_content, contact_date, contact_first_reader FROM cmw_contact WHERE contact_id = :id";
 
         if ($filter === "READ") {
             $sql .= "AND contact_is_read = 1";
@@ -31,7 +31,7 @@ class ContactModel extends AbstractModel
 
         $res = $db->prepare($sql);
 
-        if (!$res->execute(array("id" => $id))) {
+        if (!$res->execute(["id" => $id])) {
             return null;
         }
 
@@ -44,7 +44,7 @@ class ContactModel extends AbstractModel
             $res['contact_object'],
             $res['contact_content'],
             $res['contact_date'],
-            $res['contact_is_read']
+            $res['contact_first_reader']
         );
     }
 
@@ -55,16 +55,16 @@ class ContactModel extends AbstractModel
     public function getMessages(#[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): array
     {
 
-        $sql = "select contact_id from cmw_contact ORDER BY contact_date DESC";
+        $sql = "SELECT contact_id FROM cmw_contact ORDER BY contact_date DESC";
         $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
 
         if (!$res->execute()) {
-            return array();
+            return [];
         }
 
-        $toReturn = array();
+        $toReturn = [];
 
         while ($message = $res->fetch()) {
             $toReturn[] = $this->getMessageById($message["contact_id"], $filter);
@@ -75,12 +75,12 @@ class ContactModel extends AbstractModel
 
     public function addMessage(string $email, string $name, string $object, string $content): ?ContactEntity
     {
-        $var = array(
+        $var = [
             "email" => $email,
             "name" => $name,
             "object" => $object,
             "content" => $content,
-        );
+        ];
 
         $sql = "INSERT INTO cmw_contact (contact_email, contact_name, contact_object, contact_content)
                     VALUES (:email, :name, :object, :content)";
@@ -102,17 +102,17 @@ class ContactModel extends AbstractModel
 
         $db = DatabaseManager::getInstance();
         $req = $db->prepare($sql);
-        $req->execute(array("id" => $id));
+        $req->execute(["id" => $id]);
     }
 
-    public function setMessageState(int $id): void
+    public function setMessageState(int $id, int $userId): void
     {
-        $sql = "UPDATE cmw_contact SET contact_is_read = 1 WHERE contact_id = :id";
+        $sql = "UPDATE cmw_contact SET contact_first_reader = :userId WHERE contact_id = :id";
 
         $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
-        $res->execute(["id" => $id]);
+        $res->execute(['userId' => $userId, "id" => $id]);
     }
 
 }

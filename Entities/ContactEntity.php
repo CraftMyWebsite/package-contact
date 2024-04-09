@@ -3,17 +3,18 @@
 namespace CMW\Entity\Contact;
 
 use CMW\Controller\Core\CoreController;
+use CMW\Entity\Users\UserEntity;
+use CMW\Model\Users\UsersModel;
 
 class ContactEntity
 {
-
     private string $id;
     private string $email;
     private string $name;
     private string $object;
     private string $content;
     private string $date;
-    private bool $isRead;
+    private ?int $firstReader;
 
     /**
      * @param int $id ;
@@ -22,9 +23,9 @@ class ContactEntity
      * @param string $object
      * @param string $content
      * @param string $date
-     * @param bool $isRead
+     * @param ?int $firstReader
      */
-    public function __construct(int $id, string $email, string $name, string $object, string $content, string $date, bool $isRead)
+    public function __construct(int $id, string $email, string $name, string $object, string $content, string $date, ?int $firstReader)
     {
         $this->id = $id;
         $this->email = $email;
@@ -32,7 +33,7 @@ class ContactEntity
         $this->object = $object;
         $this->content = $content;
         $this->date = $date;
-        $this->isRead = $isRead;
+        $this->firstReader = $firstReader;
     }
 
     /**
@@ -84,11 +85,29 @@ class ContactEntity
     }
 
     /**
+     * @return int|null
+     */
+    public function getFirstReader(): ?int
+    {
+        return $this->firstReader;
+    }
+
+    /**
+     * @return UserEntity|null
+     */
+    public function getFirstReaderUser(): ?UserEntity
+    {
+        if (is_null($this->firstReader)) {
+            return null;
+        }
+        return UsersModel::getInstance()->getUserById($this->firstReader);
+    }
+
+    /**
      * @return bool
      */
     public function isRead(): bool
     {
-        return $this->isRead;
+        return !is_null($this->firstReader);
     }
-
 }

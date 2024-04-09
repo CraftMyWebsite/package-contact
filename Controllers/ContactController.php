@@ -11,11 +11,12 @@ use CMW\Manager\Lang\LangManager;
 use CMW\Manager\Package\AbstractController;
 use CMW\Manager\Requests\Request;
 use CMW\Manager\Router\Link;
+use CMW\Manager\Views\View;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
-use CMW\Utils\Utils;
-use CMW\Manager\Views\View;
+use CMW\Model\Users\UsersModel;
 use CMW\Utils\Redirect;
+use CMW\Utils\Utils;
 use CMW\Utils\Website;
 use JetBrains\PhpStorm\NoReturn;
 
@@ -78,9 +79,10 @@ class ContactController extends AbstractController
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
         $message = contactModel::getInstance()->getMessageById($id);
+        $userId = UsersModel::getCurrentUser()?->getId();
 
-        if (!$message?->isRead()) {
-            contactModel::getInstance()->setMessageState($id);
+        if (!is_null($userId) && !$message?->isRead()) {
+            contactModel::getInstance()->setMessageState($id, $userId);
         }
 
         View::createAdminView('Contact', 'read')

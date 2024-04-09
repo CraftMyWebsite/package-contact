@@ -7,7 +7,8 @@ $description = LangManager::translate("contact.history.description");
 
 ?>
 <div class="d-flex flex-wrap justify-content-between">
-    <h3><i class="fa-solid fa-book-open"></i> <span class="m-lg-auto"><?= LangManager::translate("contact.history.title") ?></span></h3>
+    <h3><i class="fa-solid fa-book-open"></i> <span
+            class="m-lg-auto"><?= LangManager::translate("contact.history.title") ?></span></h3>
 </div>
 
 <div class="card">
@@ -25,17 +26,17 @@ $description = LangManager::translate("contact.history.description");
             </tr>
             </thead>
             <tbody class="text-center">
-                <?php /* @var \CMW\Entity\Contact\ContactEntity[] $messages */
-                foreach ($messages as $message) : ?>
-                <tr class="<?php if ($message->isRead()!=1) { echo "h6";} ?>">
+            <?php /* @var \CMW\Entity\Contact\ContactEntity[] $messages */
+            foreach ($messages as $message) : ?>
+                <tr class="<?= $message->isRead() ? "h6" : '' ?>">
                     <td><?= mb_strimwidth($message->getName(), 0, 35, '...') ?></td>
                     <td><?= mb_strimwidth($message->getObject(), 0, 50, '...') ?></td>
-                    <td> 
-                        <?php if ($message->isRead()==1) {
-                            echo LangManager::translate("contact.message.readed");
-                        } else {
+                    <td>
+                        <?php if ($message->isRead()):
+                            echo LangManager::translate("contact.message.readed") . " - " . "<small>" . $message->getFirstReaderUser()?->getPseudo() . "</small>";
+                        else :
                             echo LangManager::translate("contact.message.notread");
-                        } ?>
+                        endif; ?>
                     </td>
                     <td><?= $message->getDate() ?></td>
                     <td class="text-center">
@@ -45,11 +46,13 @@ $description = LangManager::translate("contact.history.description");
                         <a type="button" data-bs-toggle="modal" data-bs-target="#delete-<?= $message->getId() ?>">
                             <i class="text-danger fas fa-trash-alt"></i>
                         </a>
-                        <div class="modal fade text-left" id="delete-<?= $message->getId() ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160" aria-hidden="true">
+                        <div class="modal fade text-left" id="delete-<?= $message->getId() ?>" tabindex="-1"
+                             role="dialog" aria-labelledby="myModalLabel160" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
                                 <div class="modal-content">
-                                        <div class="modal-header bg-danger">
-                                        <h5 class="modal-title white" id="myModalLabel160"><?= LangManager::translate("contact.message.deletetitle") ?></h5>
+                                    <div class="modal-header bg-danger">
+                                        <h5 class="modal-title white"
+                                            id="myModalLabel160"><?= LangManager::translate("contact.message.deletetitle") ?></h5>
                                     </div>
                                     <div class="modal-body text-left">
                                         <?= LangManager::translate("contact.message.deletealert") ?>
@@ -59,7 +62,8 @@ $description = LangManager::translate("contact.history.description");
                                             <span class=""><?= LangManager::translate("core.btn.close") ?></span>
                                         </button>
                                         <a href="../contact/delete/<?= $message->getId() ?>" class="btn btn-danger">
-                                            <span class=""><?= LangManager::translate("contact.message.delete") ?></span>
+                                            <span
+                                                class=""><?= LangManager::translate("contact.message.delete") ?></span>
                                         </a>
                                     </div>
                                 </div>
@@ -67,7 +71,7 @@ $description = LangManager::translate("contact.history.description");
                         </div>
                     </td>
                 </tr>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
     </div>
