@@ -73,6 +73,28 @@ class ContactController extends AbstractController
             ->view();
     }
 
+    #[Link("/history/deleteSelected", Link::POST, [], "/cmw-admin/contact")]
+    private function adminDeleteSelectedPost(): void
+    {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
+
+        $messageIds = $_POST['messageIds'];
+
+        if (empty($messageIds)) {
+            Flash::send(Alert::ERROR, "Contact", "Aucun message sélectionné");
+            Redirect::redirectPreviousRoute();
+        }
+
+        $i = 0;
+        foreach ($messageIds as $messageId) {
+            ContactModel::getInstance()->deleteMessage($messageId);
+            $i++;
+        }
+        Flash::send(Alert::SUCCESS, "Contact", "$i message supprimé !");
+
+        Redirect::redirectPreviousRoute();
+    }
+
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
     private function adminContactRead(Request $request, int $id): void
     {

@@ -1,6 +1,7 @@
 <?php
 
 use CMW\Manager\Lang\LangManager;
+use CMW\Manager\Security\SecurityManager;
 
 $title = LangManager::translate("contact.history.title");
 $description = LangManager::translate("contact.history.description");
@@ -9,15 +10,19 @@ $description = LangManager::translate("contact.history.description");
 <div class="d-flex flex-wrap justify-content-between">
     <h3><i class="fa-solid fa-book-open"></i> <span
             class="m-lg-auto"><?= LangManager::translate("contact.history.title") ?></span></h3>
+    <button type="submit" form="selected-message">supprimer la selection</button>
 </div>
 
 <div class="card">
     <div class="card-header">
     </div>
     <div class="card-body">
+        <form id="selected-message" action="history/deleteSelected" method="post">
+            <?php (new SecurityManager())->insertHiddenToken() ?>
         <table class="table" id="table1">
             <thead>
             <tr>
+                <th></th>
                 <th class="text-center"><?= LangManager::translate("contact.message.name") ?></th>
                 <th class="text-center"><?= LangManager::translate("contact.message.object") ?></th>
                 <th class="text-center"><?= LangManager::translate("contact.message.state") ?></th>
@@ -26,9 +31,11 @@ $description = LangManager::translate("contact.history.description");
             </tr>
             </thead>
             <tbody class="text-center">
+
             <?php /* @var \CMW\Entity\Contact\ContactEntity[] $messages */
             foreach ($messages as $message) : ?>
                 <tr class="<?= $message->isRead() ? "h6" : '' ?>">
+                    <td><input type="checkbox" name="messageIds[]" value="<?= $message->getId() ?>"></td>
                     <td><?= mb_strimwidth($message->getName(), 0, 35, '...') ?></td>
                     <td><?= mb_strimwidth($message->getObject(), 0, 50, '...') ?></td>
                     <td>
@@ -74,5 +81,6 @@ $description = LangManager::translate("contact.history.description");
             <?php endforeach; ?>
             </tbody>
         </table>
+        </form>
     </div>
 </div>
