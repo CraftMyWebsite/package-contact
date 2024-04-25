@@ -1,6 +1,6 @@
 <?php
 
-namespace CMW\Implementation\Contact;
+namespace CMW\Implementation\Contact\Core;
 
 use CMW\Interface\Core\IMenus;
 use CMW\Manager\Lang\LangManager;
