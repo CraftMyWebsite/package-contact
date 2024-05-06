@@ -57,7 +57,15 @@ return [
             "success" => "Message supprimé !",
         ],
         "error" => [
-            "notConfigured" => "Merci de correctement configurer le package Contact."
+            "notConfigured" => "Merci de correctement configurer le package Contact.",
+        ],
+    ],
+    "permissions" => [
+        "contact" => [
+            "settings" => "Modifier les paramètres de contact",
+            "history" => "Afficher l'historique",
+            "delete" => "Supprimer un message",
+            "stats" => "Afficher les stats",
         ],
     ],
 ];

@@ -57,7 +57,15 @@ return [
             "success" => "Message deleted !",
         ],
         "error" => [
-            "notConfigured" => "Please configure your Contact package."
+            "notConfigured" => "Please configure your Contact package.",
+        ],
+    ],
+    "permissions" => [
+        "contact" => [
+            "settings" => "Edit settings",
+            "history" => "Show history",
+            "delete" => "Delete messages",
+            "stats" => "Show stats",
         ],
     ],
 ];
