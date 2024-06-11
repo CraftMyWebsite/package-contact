@@ -7,10 +7,10 @@ $title = LangManager::translate("contact.history.title");
 $description = LangManager::translate("contact.history.description");
 
 ?>
-<div class="d-flex flex-wrap justify-content-between">
+<div class="d-flex flex-wrap justify-content-between mb-3">
     <h3><i class="fa-solid fa-book-open"></i> <span
             class="m-lg-auto"><?= LangManager::translate("contact.history.title") ?></span></h3>
-    <button type="submit" form="selected-message">supprimer la selection</button>
+    <button type="submit" class="btn btn-danger" form="selected-message">Supprimer la selection</button>
 </div>
 
 <div class="card">
@@ -35,7 +35,7 @@ $description = LangManager::translate("contact.history.description");
             <?php /* @var \CMW\Entity\Contact\ContactEntity[] $messages */
             foreach ($messages as $message) : ?>
                 <tr class="<?= $message->isRead() ? "h6" : '' ?>">
-                    <td><input type="checkbox" name="messageIds[]" value="<?= $message->getId() ?>"></td>
+                    <td><input class="form-check-input" type="checkbox" name="messageIds[]" value="<?= $message->getId() ?>"></td>
                     <td><?= mb_strimwidth($message->getName(), 0, 35, '...') ?></td>
                     <td><?= mb_strimwidth($message->getObject(), 0, 50, '...') ?></td>
                     <td>
