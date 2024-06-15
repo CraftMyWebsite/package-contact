@@ -37,6 +37,10 @@ class ContactModel extends AbstractModel
 
         $res = $res->fetch();
 
+        if (!$res) {
+            return null;
+        }
+
         return new ContactEntity(
             $res['contact_id'],
             $res['contact_email'],
@@ -89,20 +93,19 @@ class ContactModel extends AbstractModel
 
         $res = $db->prepare($sql);
 
-        if ($res->execute($var)) {
-            return $this->getMessageById($db->lastInsertId());
+        if (!$res->execute($var)) {
+            return null;
         }
 
-        return null;
+        return $this->getMessageById($db->lastInsertId());
     }
 
-    public function deleteMessage(int $id): void
+    public function deleteMessage(int $id): bool
     {
         $sql = "DELETE FROM cmw_contact WHERE contact_id=:id";
 
         $db = DatabaseManager::getInstance();
-        $req = $db->prepare($sql);
-        $req->execute(["id" => $id]);
+        return $db->prepare($sql)->execute(["id" => $id]);
     }
 
     public function setMessageState(int $id, int $userId): void

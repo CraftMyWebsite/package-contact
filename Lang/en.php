@@ -55,6 +55,7 @@ return [
         ],
         "delete" => [
             "success" => "Message deleted !",
+            "error" => "Unable to delete this message !",
         ],
         "error" => [
             "notConfigured" => "Please configure your Contact package.",

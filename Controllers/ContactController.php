@@ -2,9 +2,8 @@
 
 namespace CMW\Controller\Contact;
 
-use CMW\Controller\Core\MailController;
-use CMW\Controller\Core\SecurityController;
 use CMW\Controller\Users\UsersController;
+use CMW\Manager\Filter\FilterManager;
 use CMW\Manager\Flash\Alert;
 use CMW\Manager\Flash\Flash;
 use CMW\Manager\Lang\LangManager;
@@ -17,7 +16,6 @@ use CMW\Model\Contact\ContactSettingsModel;
 use CMW\Model\Users\UsersModel;
 use CMW\Utils\Redirect;
 use CMW\Utils\Utils;
-use CMW\Utils\Website;
 use JetBrains\PhpStorm\NoReturn;
 
 /**
@@ -43,7 +41,7 @@ class ContactController extends AbstractController
             ->view();
     }
 
-    #[Link("/settings", Link::POST, [], "/cmw-admin/contact")]
+    #[NoReturn] #[Link("/settings", Link::POST, [], "/cmw-admin/contact")]
     private function adminContactSettingsPost(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
@@ -66,14 +64,15 @@ class ContactController extends AbstractController
         $messages = contactModel::getInstance()->getMessages();
 
         View::createAdminView('Contact', 'history')
-            ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css", "Admin/Resources/Assets/Css/Pages/simple-datatables.css")
+            ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css",
+                "Admin/Resources/Assets/Css/Pages/simple-datatables.css")
             ->addScriptAfter("Admin/Resources/Vendors/Simple-datatables/Umd/simple-datatables.js",
                 "Admin/Resources/Assets/Js/Pages/simple-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
     }
 
-    #[Link("/history/deleteSelected", Link::POST, [], "/cmw-admin/contact")]
+    #[NoReturn] #[Link("/history/deleteSelected", Link::POST, [], "/cmw-admin/contact")]
     private function adminDeleteSelectedPost(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
@@ -87,12 +86,13 @@ class ContactController extends AbstractController
 
         $i = 0;
         foreach ($messageIds as $messageId) {
+            $messageId = FilterManager::filterData($messageId, 11, FILTER_SANITIZE_NUMBER_INT);
             ContactModel::getInstance()->deleteMessage($messageId);
             $i++;
         }
         Flash::send(Alert::SUCCESS, "Contact", "$i message supprimé !");
 
-        Redirect::redirectPreviousRoute();
+        Redirect::redirect("cmw-admin/contact/history");
     }
 
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
@@ -113,17 +113,20 @@ class ContactController extends AbstractController
             ->view();
     }
 
-    #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    #[NoReturn] #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
     private function adminContactDelete(Request $request, int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
 
-        contactModel::getInstance()->deleteMessage($id);
+        if (contactModel::getInstance()->deleteMessage($id)) {
+            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
+                LangManager::translate("contact.toaster.delete.success"));
+        } else {
+            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
+                LangManager::translate("contact.toaster.delete.error"));
+        }
 
-        Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
-            LangManager::translate("contact.toaster.delete.success"));
-
-        Redirect::redirectPreviousRoute();
+        Redirect::redirect("cmw-admin/contact/history");
     }
 
     #[Link("/stats", Link::GET, [], "/cmw-admin/contact")]
@@ -134,49 +137,4 @@ class ContactController extends AbstractController
         View::createAdminView('Contact', 'stats')
             ->view();
     }
-
-
-    /* PUBLIC AREA */
-
-    #[Link("/", Link::GET, [], "/contact")]
-    private function publicContact(): void
-    {
-        View::basicPublicView("Contact", "main");
-    }
-
-
-    #[NoReturn] #[Link("/", Link::POST, [], "/contact")]
-    private function publicContactPost(): void
-    {
-        [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
-
-        $config = contactSettingsModel::getInstance()->getConfig();
-
-        if ($config === null || $config->getEmail() === null) {
-            Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
-                LangManager::translate('contact.toaster.error.notConfigured'));
-            Redirect::redirectPreviousRoute();
-        }
-        if (SecurityController::checkCaptcha()) {
-
-            if (Utils::containsNullValue($email, $name, $object, $content)) {
-                Flash::send(Alert::ERROR, LangManager::translate('core.toaster.error'),
-                    LangManager::translate('contact.toaster.send.errorFillFields'));
-                Redirect::redirectPreviousRoute();
-            }
-
-            contactModel::getInstance()->addMessage($email, $name, $object, $content);
-
-            MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
-            MailController::getInstance()->sendMail($config->getEmail(), "[" . Website::getWebsiteName() . "]" . LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail") . $email . LangManager::translate("contact.mail.name") . $name . LangManager::translate("contact.mail.object_sender") . $object . LangManager::translate("contact.mail.content") . $content);
-
-            Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
-                LangManager::translate("contact.toaster.send.success"));
-        } else {
-            Flash::send(Alert::ERROR, LangManager::translate("core.toaster.error"),
-                LangManager::translate("contact.toaster.send.error-captcha"));
-        }
-        Redirect::redirectPreviousRoute();
-    }
-
 }
