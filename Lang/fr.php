@@ -63,9 +63,9 @@ return [
     ],
     "permissions" => [
         "contact" => [
-            "settings" => "Modifier les paramètres de contact",
+            "settings" => "Modifier les paramètres",
             "history" => "Afficher l'historique",
-            "delete" => "Supprimer un message",
+            "delete" => "Supprimer un/des message(s)",
             "stats" => "Afficher les stats",
         ],
     ],
