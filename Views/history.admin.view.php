@@ -3,6 +3,8 @@
 use CMW\Manager\Lang\LangManager;
 use CMW\Manager\Security\SecurityManager;
 
+/* @var \CMW\Entity\Contact\ContactEntity[] $messages */
+
 $title = LangManager::translate("contact.history.title");
 $description = LangManager::translate("contact.history.description");
 
@@ -10,7 +12,7 @@ $description = LangManager::translate("contact.history.description");
 
 <div class="page-title">
     <h3><i class="fa-solid fa-book-open"></i> <?= LangManager::translate("contact.history.title") ?></h3>
-    <button type="submit" class="btn-danger loading-btn" data-loading-btn="Chargement" data-target-table="1">
+    <button type="submit" class="btn-danger btn-mass-delete loading-btn" data-loading-btn="Chargement" data-target-table="1">
         Supprimer la selection
     </button>
 </div>
@@ -28,8 +30,7 @@ $description = LangManager::translate("contact.history.description");
         </tr>
         </thead>
         <tbody>
-        <?php /* @var \CMW\Entity\Contact\ContactEntity[] $messages */
-        foreach ($messages as $message) : ?>
+        <?php foreach ($messages as $message) : ?>
             <tr class="<?= $message->isRead() ? "h6" : '' ?>">
                 <td class="item-selector" data-value="<?= $message->getId() ?>"></td>
                 <td><?= mb_strimwidth($message->getName(), 0, 35, '...') ?></td>
