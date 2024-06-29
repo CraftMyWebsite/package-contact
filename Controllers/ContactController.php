@@ -64,20 +64,19 @@ class ContactController extends AbstractController
         $messages = contactModel::getInstance()->getMessages();
 
         View::createAdminView('Contact', 'history')
-            ->addStyle("Admin/Resources/Vendors/Simple-datatables/style.css",
-                "Admin/Resources/Assets/Css/Pages/simple-datatables.css")
+            ->addStyle("Admin/Resources/Assets/Css/simple-datatables.css")
             ->addScriptAfter("Admin/Resources/Vendors/Simple-datatables/Umd/simple-datatables.js",
-                "Admin/Resources/Assets/Js/Pages/simple-datatables.js")
+                "Admin/Resources/Vendors/Simple-datatables/config-datatables.js")
             ->addVariableList(["messages" => $messages])
             ->view();
     }
 
-    #[NoReturn] #[Link("/history/deleteSelected", Link::POST, [], "/cmw-admin/contact")]
+    #[NoReturn] #[Link("/history/deleteSelected", Link::POST, [], "/cmw-admin/contact", secure: false)]
     private function adminDeleteSelectedPost(): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
-        $messageIds = $_POST['messageIds'];
+        $messageIds = $_POST['selectedIds'];
 
         if (empty($messageIds)) {
             Flash::send(Alert::ERROR, "Contact", "Aucun message sélectionné");
