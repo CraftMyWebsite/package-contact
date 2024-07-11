@@ -35,20 +35,22 @@ class ContactSettingsModel extends AbstractModel
         return new ContactSettingsEntity(
             $res['contact_settings_email'],
             $res['contact_settings_object_confirmation'],
-            $res['contact_settings_mail_confirmation']
+            $res['contact_settings_mail_confirmation'],
+            $res['contact_settings_anti_spam']
         );
     }
 
-    public function updateConfig(?string $email, ?string $object = null, ?string $mail = null): ?ContactSettingsEntity
+    public function updateConfig(?string $email, ?string $object = null, ?string $mail = null, int $antiSpam): ?ContactSettingsEntity
     {
         $info = [
             "email" => $email,
             "object" => $object,
             "mail" => $mail,
+            "antiSpam" => $antiSpam,
         ];
 
         $sql = "UPDATE cmw_contact_settings SET contact_settings_email = :email,
-                        contact_settings_object_confirmation = :object, contact_settings_mail_confirmation = :mail";
+                        contact_settings_object_confirmation = :object, contact_settings_mail_confirmation = :mail, contact_settings_anti_spam = :antiSpam";
 
         $db = DatabaseManager::getInstance();
         $req = $db->prepare($sql);

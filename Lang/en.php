@@ -2,6 +2,11 @@
 
 return [
     "contact" => "Contact",
+    "antispam" => [
+        "title" => "Anti Spam",
+        "description" => "Sorry you don't respect our usage policy!",
+        "setting" => "Enable anti-spam",
+    ],
     "settings" => [
         "title" => "Contact settings",
         "description" => "Manage your contact form settings",

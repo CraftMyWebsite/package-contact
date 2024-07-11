@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS `cmw_contact_settings`
 (
     `contact_settings_email`               VARCHAR(100) NULL,
     `contact_settings_object_confirmation` VARCHAR(255) NULL,
-    `contact_settings_mail_confirmation`   MEDIUMTEXT   NULL
+    `contact_settings_mail_confirmation`   MEDIUMTEXT   NULL,
+    `contact_settings_anti_spam`          INT NOT NULL DEFAULT 1
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -25,5 +26,5 @@ CREATE TABLE IF NOT EXISTS `cmw_contact`
 
 
 INSERT INTO `cmw_contact_settings` (`contact_settings_email`, `contact_settings_object_confirmation`,
-                                    `contact_settings_mail_confirmation`)
-VALUES (NULL, NULL, NULL);
+                                    `contact_settings_mail_confirmation`, `contact_settings_anti_spam`)
+VALUES (NULL, NULL, NULL, 1);

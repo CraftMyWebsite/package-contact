@@ -46,9 +46,11 @@ class ContactController extends AbstractController
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.settings");
 
-        [$email, $object, $mail] = Utils::filterInput("email", "object", "mail");
+        [$email, $object, $mail, $antiSpam] = Utils::filterInput("email", "object", "mail", "antiSpam");
 
-        contactSettingsModel::getInstance()->updateConfig($email ?? null, $object, $mail);
+        if (is_null($antiSpam)) { $antiSpam = 0;}
+
+        contactSettingsModel::getInstance()->updateConfig($email ?? null, $object, $mail, $antiSpam);
 
         Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("core.toaster.config.success"));

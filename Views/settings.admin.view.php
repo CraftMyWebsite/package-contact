@@ -16,8 +16,16 @@ $description = LangManager::translate("contact.settings.description");
 </div>
 
 <div class="card">
+
     <form id="settings" action="" method="post">
         <?php (new SecurityManager())->insertHiddenToken() ?>
+        <div class="mb-4">
+            <label class="toggle">
+                <p class="toggle-label"><?= LangManager::translate("contact.antispam.setting") ?></p>
+                <input type="checkbox" name="antiSpam" class="toggle-input" <?= $config->getAntiSpamActive() ? 'checked' : '' ?>>
+                <div class="toggle-slider"></div>
+            </label>
+        </div>
         <div class="grid-2">
             <div>
                 <label for="email"><?= LangManager::translate("contact.settings.email") ?> :</label>

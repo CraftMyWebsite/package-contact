@@ -2,6 +2,11 @@
 
 return [
     "contact" => "Contact",
+    "antispam" => [
+        "title" => "Anti Spam",
+        "description" => "Navré vous ne respectez pas notre politique d'utilisation !",
+        "setting" => "Activer l'anti spam",
+    ],
     "settings" => [
         "title" => "Paramètres contact",
         "description" => "Gérez les paramètres de vos formulaires de contact",
