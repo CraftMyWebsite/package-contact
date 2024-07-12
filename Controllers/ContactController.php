@@ -64,12 +64,31 @@ class ContactController extends AbstractController
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
         $messages = contactModel::getInstance()->getMessages();
+        $unreadNonSpam = ContactModel::getInstance()->countUnreadNonSpam();
+        $unreadSpam = ContactModel::getInstance()->countUnreadSpam();
 
         View::createAdminView('Contact', 'history')
             ->addStyle("Admin/Resources/Assets/Css/simple-datatables.css")
             ->addScriptAfter("Admin/Resources/Vendors/Simple-datatables/simple-datatables.js",
                 "Admin/Resources/Vendors/Simple-datatables/config-datatables.js")
-            ->addVariableList(["messages" => $messages])
+            ->addVariableList(["messages" => $messages,"unreadNonSpam" => $unreadNonSpam,"unreadSpam" => $unreadSpam])
+            ->view();
+    }
+
+    #[Link("/history/spam", Link::GET, [], "/cmw-admin/contact")]
+    private function adminContactHistorySpam(): void
+    {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
+
+        $messages = contactModel::getInstance()->getMessages();
+        $unreadNonSpam = ContactModel::getInstance()->countUnreadNonSpam();
+        $unreadSpam = ContactModel::getInstance()->countUnreadSpam();
+
+        View::createAdminView('Contact', 'historySpam')
+            ->addStyle("Admin/Resources/Assets/Css/simple-datatables.css")
+            ->addScriptAfter("Admin/Resources/Vendors/Simple-datatables/simple-datatables.js",
+                "Admin/Resources/Vendors/Simple-datatables/config-datatables.js")
+            ->addVariableList(["messages" => $messages,"unreadNonSpam" => $unreadNonSpam,"unreadSpam" => $unreadSpam])
             ->view();
     }
 
@@ -93,7 +112,7 @@ class ContactController extends AbstractController
         }
         Flash::send(Alert::SUCCESS, "Contact", "$i message supprimé !");
 
-        Redirect::redirect("cmw-admin/contact/history");
+        Redirect::redirectPreviousRoute();
     }
 
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
@@ -127,7 +146,7 @@ class ContactController extends AbstractController
                 LangManager::translate("contact.toaster.delete.error"));
         }
 
-        Redirect::redirect("cmw-admin/contact/history");
+        Redirect::redirectPreviousRoute();
     }
 
     #[Link("/stats", Link::GET, [], "/cmw-admin/contact")]
@@ -137,5 +156,29 @@ class ContactController extends AbstractController
 
         View::createAdminView('Contact', 'stats')
             ->view();
+    }
+
+    #[Link("/spam/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    private function adminContactSpam(Request $request, int $id): void
+    {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
+
+        ContactModel::getInstance()->setSpam($id, 1);
+
+        Flash::send(Alert::SUCCESS, LangManager::translate('contact.antispam.title'), "Marqué comme spam !" );
+
+        Redirect::redirectPreviousRoute();
+    }
+
+    #[Link("/nonSpam/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
+    private function adminContactNonSpam(Request $request, int $id): void
+    {
+        UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
+
+        ContactModel::getInstance()->setSpam($id, 0);
+
+        Flash::send(Alert::SUCCESS, LangManager::translate('contact.antispam.title'), "Marqué comme non spam !" );
+
+        Redirect::redirectPreviousRoute();
     }
 }

@@ -9,6 +9,7 @@ use CMW\Manager\Flash\Flash;
 use CMW\Manager\Lang\LangManager;
 use CMW\Manager\Package\AbstractController;
 use CMW\Manager\Router\Link;
+use CMW\Manager\Security\EncryptManager;
 use CMW\Manager\Views\View;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
@@ -37,25 +38,35 @@ class ContactPublicController extends AbstractController
     {
         [$email, $name, $object, $content] = Utils::filterInput("email", "name", "object", "content");
 
+        $encryptedMail = EncryptManager::encrypt($email);
+        $encryptedName = EncryptManager::encrypt($name);
+        $encryptedObject = EncryptManager::encrypt($object);
+        $encryptedContent = EncryptManager::encrypt($content);
+
         if (ContactSettingsModel::getInstance()->getConfig()->getAntiSpamActive()) {
             if ($this->is_blacklisted_email($email)) {
-                Flash::send(Alert::WARNING, LangManager::translate('contact.antispam.title'), LangManager::translate('contact.antispam.description'));
+                contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 1);
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"), LangManager::translate("contact.toaster.send.success"));
                 Redirect::redirectPreviousRoute();
             }
             if ($this->contains_blacklisted_word($email)) {
-                Flash::send(Alert::WARNING, LangManager::translate('contact.antispam.title'), LangManager::translate('contact.antispam.description'));
+                contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 1);
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"), LangManager::translate("contact.toaster.send.success"));
                 Redirect::redirectPreviousRoute();
             }
             if ($this->contains_blacklisted_word($name)) {
-                Flash::send(Alert::WARNING, LangManager::translate('contact.antispam.title'), LangManager::translate('contact.antispam.description'));
+                contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 1);
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"), LangManager::translate("contact.toaster.send.success"));
                 Redirect::redirectPreviousRoute();
             }
             if ($this->contains_blacklisted_word($object)) {
-                Flash::send(Alert::WARNING, LangManager::translate('contact.antispam.title'), LangManager::translate('contact.antispam.description'));
+                contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 1);
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"), LangManager::translate("contact.toaster.send.success"));
                 Redirect::redirectPreviousRoute();
             }
             if ($this->contains_blacklisted_word($content)) {
-                Flash::send(Alert::WARNING, LangManager::translate('contact.antispam.title'), LangManager::translate('contact.antispam.description'));
+                contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 1);
+                Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"), LangManager::translate("contact.toaster.send.success"));
                 Redirect::redirectPreviousRoute();
             }
         }
@@ -75,7 +86,7 @@ class ContactPublicController extends AbstractController
                 Redirect::redirectPreviousRoute();
             }
 
-            contactModel::getInstance()->addMessage($email, $name, $object, $content);
+            contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 0);
 
             MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
             MailController::getInstance()->sendMail($config->getEmail(), "[" . Website::getWebsiteName() . "]" . LangManager::translate("contact.mail.object"), LangManager::translate("contact.mail.mail") . $email . LangManager::translate("contact.mail.name") . $name . LangManager::translate("contact.mail.object_sender") . $object . LangManager::translate("contact.mail.content") . $content);

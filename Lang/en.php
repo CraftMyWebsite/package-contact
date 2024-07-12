@@ -6,6 +6,8 @@ return [
         "title" => "Anti Spam",
         "description" => "Sorry you don't respect our usage policy!",
         "setting" => "Enable anti-spam",
+        "inbox" => "Inbox",
+        "junk" => "Junk",
     ],
     "settings" => [
         "title" => "Contact settings",

@@ -6,6 +6,8 @@ return [
         "title" => "Anti Spam",
         "description" => "Navré vous ne respectez pas notre politique d'utilisation !",
         "setting" => "Activer l'anti spam",
+        "inbox" => "Boîte de réception",
+        "junk" => "Spam",
     ],
     "settings" => [
         "title" => "Paramètres contact",

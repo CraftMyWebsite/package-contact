@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `cmw_contact`
     `contact_content`      MEDIUMTEXT   NOT NULL,
     `contact_date`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `contact_first_reader` INT          NULL     DEFAULT NULL,
+    `contact_is_spam` INT          NOT NULL NULL     DEFAULT 0,
     PRIMARY KEY (`contact_id`),
     CONSTRAINT `cmw_contact_ibfk_1` FOREIGN KEY (`contact_first_reader`)
         REFERENCES `cmw_users` (`user_id`) ON DELETE SET NULL ON UPDATE SET NULL

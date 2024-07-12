@@ -4,6 +4,7 @@ namespace CMW\Entity\Contact;
 
 use CMW\Controller\Core\CoreController;
 use CMW\Entity\Users\UserEntity;
+use CMW\Manager\Security\EncryptManager;
 use CMW\Model\Users\UsersModel;
 
 class ContactEntity
@@ -15,6 +16,7 @@ class ContactEntity
     private string $content;
     private string $date;
     private ?int $firstReader;
+    private int $isSpam;
 
     /**
      * @param int $id ;
@@ -24,8 +26,9 @@ class ContactEntity
      * @param string $content
      * @param string $date
      * @param ?int $firstReader
+     * @param int $isSpam
      */
-    public function __construct(int $id, string $email, string $name, string $object, string $content, string $date, ?int $firstReader)
+    public function __construct(int $id, string $email, string $name, string $object, string $content, string $date, ?int $firstReader, int $isSpam)
     {
         $this->id = $id;
         $this->email = $email;
@@ -34,6 +37,7 @@ class ContactEntity
         $this->content = $content;
         $this->date = $date;
         $this->firstReader = $firstReader;
+        $this->isSpam = $isSpam;
     }
 
     /**
@@ -49,7 +53,7 @@ class ContactEntity
      */
     public function getEmail(): string
     {
-        return $this->email;
+        return EncryptManager::decrypt($this->email);
     }
 
     /**
@@ -57,7 +61,7 @@ class ContactEntity
      */
     public function getName(): string
     {
-        return $this->name;
+        return EncryptManager::decrypt($this->name);
     }
 
     /**
@@ -65,7 +69,7 @@ class ContactEntity
      */
     public function getObject(): string
     {
-        return $this->object;
+        return EncryptManager::decrypt($this->object);
     }
 
     /**
@@ -73,7 +77,7 @@ class ContactEntity
      */
     public function getContent(): string
     {
-        return $this->content;
+        return EncryptManager::decrypt($this->content);
     }
 
     /**
@@ -109,5 +113,13 @@ class ContactEntity
     public function isRead(): bool
     {
         return !is_null($this->firstReader);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSpam(): bool
+    {
+        return $this->isSpam;
     }
 }
