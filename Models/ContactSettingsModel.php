@@ -40,7 +40,7 @@ class ContactSettingsModel extends AbstractModel
         );
     }
 
-    public function updateConfig(?string $email, ?string $object = null, ?string $mail = null, int $antiSpam): ?ContactSettingsEntity
+    public function updateConfig(?string $email, int $antiSpam, ?string $object = null, ?string $mail = null, ): ?ContactSettingsEntity
     {
         $info = [
             "email" => $email,

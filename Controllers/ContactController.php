@@ -50,7 +50,7 @@ class ContactController extends AbstractController
 
         if (is_null($antiSpam)) { $antiSpam = 0;}
 
-        contactSettingsModel::getInstance()->updateConfig($email ?? null, $object, $mail, $antiSpam);
+        contactSettingsModel::getInstance()->updateConfig($email ?? null, $antiSpam, $object, $mail);
 
         Flash::send(Alert::SUCCESS, LangManager::translate("core.toaster.success"),
             LangManager::translate("core.toaster.config.success"));
