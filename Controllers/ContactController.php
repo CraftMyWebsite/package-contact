@@ -8,7 +8,7 @@ use CMW\Manager\Flash\Alert;
 use CMW\Manager\Flash\Flash;
 use CMW\Manager\Lang\LangManager;
 use CMW\Manager\Package\AbstractController;
-use CMW\Manager\Requests\Request;
+
 use CMW\Manager\Router\Link;
 use CMW\Manager\Views\View;
 use CMW\Model\Contact\ContactModel;
@@ -116,7 +116,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/read/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    private function adminContactRead(Request $request, int $id): void
+    private function adminContactRead(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
@@ -134,7 +134,7 @@ class ContactController extends AbstractController
     }
 
     #[NoReturn] #[Link("/delete/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    private function adminContactDelete(Request $request, int $id): void
+    private function adminContactDelete(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.delete");
 
@@ -159,7 +159,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/spam/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    private function adminContactSpam(Request $request, int $id): void
+    private function adminContactSpam(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
@@ -171,7 +171,7 @@ class ContactController extends AbstractController
     }
 
     #[Link("/nonSpam/:id", Link::GET, ["id" => "[0-9]+"], "/cmw-admin/contact")]
-    private function adminContactNonSpam(Request $request, int $id): void
+    private function adminContactNonSpam(int $id): void
     {
         UsersController::redirectIfNotHavePermissions("core.dashboard", "contact.history");
 
