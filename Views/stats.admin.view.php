@@ -1,7 +1,7 @@
 <?php
 
-$title = "Soon";
-$description = "Soon";
+$title = 'Soon';
+$description = 'Soon';
 ?>
 
 <section>

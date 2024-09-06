@@ -15,23 +15,21 @@ use JetBrains\PhpStorm\ExpectedValues;
  */
 class ContactModel extends AbstractModel
 {
-
-    public function getMessageById(int $id, #[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): ?ContactEntity
+    public function getMessageById(int $id, #[ExpectedValues(['READ', 'UNREAD'])] ?string $filter = null): ?ContactEntity
     {
+        $sql = 'SELECT * FROM cmw_contact WHERE contact_id = :id';
 
-        $sql = "SELECT * FROM cmw_contact WHERE contact_id = :id";
-
-        if ($filter === "READ") {
-            $sql .= "AND contact_is_read = 1";
-        } else if ($filter === "UNREAD") {
-            $sql .= "AND contact_is_read = 0";
+        if ($filter === 'READ') {
+            $sql .= 'AND contact_is_read = 1';
+        } else if ($filter === 'UNREAD') {
+            $sql .= 'AND contact_is_read = 0';
         }
 
         $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
 
-        if (!$res->execute(["id" => $id])) {
+        if (!$res->execute(['id' => $id])) {
             return null;
         }
 
@@ -53,14 +51,12 @@ class ContactModel extends AbstractModel
         );
     }
 
-
     /**
      * @return \CMW\Entity\Pages\PageEntity[]
      */
-    public function getMessages(#[ExpectedValues(["READ", "UNREAD"])] ?string $filter = null): array
+    public function getMessages(#[ExpectedValues(['READ', 'UNREAD'])] ?string $filter = null): array
     {
-
-        $sql = "SELECT contact_id FROM cmw_contact ORDER BY contact_date DESC";
+        $sql = 'SELECT contact_id FROM cmw_contact ORDER BY contact_date DESC';
         $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
@@ -72,7 +68,7 @@ class ContactModel extends AbstractModel
         $toReturn = [];
 
         while ($message = $res->fetch()) {
-            $toReturn[] = $this->getMessageById($message["contact_id"], $filter);
+            $toReturn[] = $this->getMessageById($message['contact_id'], $filter);
         }
 
         return $toReturn;
@@ -81,15 +77,15 @@ class ContactModel extends AbstractModel
     public function addMessage(string $email, string $name, string $object, string $content, int $isSpam): ?ContactEntity
     {
         $var = [
-            "email" => $email,
-            "name" => $name,
-            "object" => $object,
-            "content" => $content,
-            "isSpam" => $isSpam,
+            'email' => $email,
+            'name' => $name,
+            'object' => $object,
+            'content' => $content,
+            'isSpam' => $isSpam,
         ];
 
-        $sql = "INSERT INTO cmw_contact (contact_email, contact_name, contact_object, contact_content, contact_is_spam)
-                    VALUES (:email, :name, :object, :content, :isSpam)";
+        $sql = 'INSERT INTO cmw_contact (contact_email, contact_name, contact_object, contact_content, contact_is_spam)
+                    VALUES (:email, :name, :object, :content, :isSpam)';
 
         $db = DatabaseManager::getInstance();
 
@@ -104,47 +100,47 @@ class ContactModel extends AbstractModel
 
     public function deleteMessage(int $id): bool
     {
-        $sql = "DELETE FROM cmw_contact WHERE contact_id=:id";
+        $sql = 'DELETE FROM cmw_contact WHERE contact_id=:id';
 
         $db = DatabaseManager::getInstance();
-        return $db->prepare($sql)->execute(["id" => $id]);
+        return $db->prepare($sql)->execute(['id' => $id]);
     }
 
     public function setMessageState(int $id, int $userId): void
     {
-        $sql = "UPDATE cmw_contact SET contact_first_reader = :userId WHERE contact_id = :id";
+        $sql = 'UPDATE cmw_contact SET contact_first_reader = :userId WHERE contact_id = :id';
 
         $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
-        $res->execute(['userId' => $userId, "id" => $id]);
+        $res->execute(['userId' => $userId, 'id' => $id]);
     }
 
     public function setSpam(int $id, int $isSpam): void
     {
-        $sql = "UPDATE cmw_contact SET contact_is_spam = :isSpam WHERE contact_id = :id";
+        $sql = 'UPDATE cmw_contact SET contact_is_spam = :isSpam WHERE contact_id = :id';
 
         $db = DatabaseManager::getInstance();
 
         $res = $db->prepare($sql);
-        $res->execute(["id" => $id, "isSpam" => $isSpam]);
+        $res->execute(['id' => $id, 'isSpam' => $isSpam]);
     }
 
     public function countUnreadNonSpam(): int
     {
-        $sql = "SELECT COUNT(*) AS unread_non_spam FROM cmw_contact WHERE contact_first_reader IS NULL AND contact_is_spam = 0";
+        $sql = 'SELECT COUNT(*) AS unread_non_spam FROM cmw_contact WHERE contact_first_reader IS NULL AND contact_is_spam = 0';
 
         $db = DatabaseManager::getInstance();
 
         $req = $db->prepare($sql);
 
-        if (!$req->execute()){
+        if (!$req->execute()) {
             return 0;
         }
 
         $res = $req->fetch();
 
-        if (!$res){
+        if (!$res) {
             return 0;
         }
 
@@ -153,23 +149,22 @@ class ContactModel extends AbstractModel
 
     public function countUnreadSpam(): int
     {
-        $sql = "SELECT COUNT(*) AS unread_spam FROM cmw_contact WHERE contact_first_reader IS NULL AND contact_is_spam = 1";
+        $sql = 'SELECT COUNT(*) AS unread_spam FROM cmw_contact WHERE contact_first_reader IS NULL AND contact_is_spam = 1';
 
         $db = DatabaseManager::getInstance();
 
         $req = $db->prepare($sql);
 
-        if (!$req->execute()){
+        if (!$req->execute()) {
             return 0;
         }
 
         $res = $req->fetch();
 
-        if (!$res){
+        if (!$res) {
             return 0;
         }
 
         return $res['unread_spam'] ?? 0;
     }
-
 }

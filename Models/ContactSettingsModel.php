@@ -16,11 +16,10 @@ class ContactSettingsModel extends AbstractModel
 {
     public function getConfig(): ?ContactSettingsEntity
     {
-        $sql = "SELECT * FROM cmw_contact_settings LIMIT 1";
+        $sql = 'SELECT * FROM cmw_contact_settings LIMIT 1';
 
         $db = DatabaseManager::getInstance();
         $res = $db->prepare($sql);
-
 
         if (!$res->execute()) {
             return null;
@@ -40,17 +39,21 @@ class ContactSettingsModel extends AbstractModel
         );
     }
 
-    public function updateConfig(?string $email, int $antiSpam, ?string $object = null, ?string $mail = null, ): ?ContactSettingsEntity
-    {
+    public function updateConfig(
+        ?string $email,
+        int $antiSpam,
+        ?string $object = null,
+        ?string $mail = null,
+    ): ?ContactSettingsEntity {
         $info = [
-            "email" => $email,
-            "object" => $object,
-            "mail" => $mail,
-            "antiSpam" => $antiSpam,
+            'email' => $email,
+            'object' => $object,
+            'mail' => $mail,
+            'antiSpam' => $antiSpam,
         ];
 
-        $sql = "UPDATE cmw_contact_settings SET contact_settings_email = :email,
-                        contact_settings_object_confirmation = :object, contact_settings_mail_confirmation = :mail, contact_settings_anti_spam = :antiSpam";
+        $sql = 'UPDATE cmw_contact_settings SET contact_settings_email = :email,
+                        contact_settings_object_confirmation = :object, contact_settings_mail_confirmation = :mail, contact_settings_anti_spam = :antiSpam';
 
         $db = DatabaseManager::getInstance();
         $req = $db->prepare($sql);
@@ -60,5 +63,4 @@ class ContactSettingsModel extends AbstractModel
 
         return $this->getConfig();
     }
-
 }

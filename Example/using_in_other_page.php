@@ -1,7 +1,7 @@
 <!------------------------------------
     ----- Required namespace-----
 -------------------------------------->
-<?php 
+<?php
 use CMW\Manager\Security\SecurityManager;
 use CMW\Model\Contact\ContactModel;
 ?>

@@ -15,7 +15,7 @@ class ContactSettingsEntity
      * @param ?string $mailConfirmation
      * @param bool $antiSpam
      */
-    public function __construct(?string $email,?string $objectConfirmation, ?string $mailConfirmation, bool $antiSpam)
+    public function __construct(?string $email, ?string $objectConfirmation, ?string $mailConfirmation, bool $antiSpam)
     {
         $this->email = $email;
         $this->objectConfirmation = $objectConfirmation;
@@ -39,7 +39,6 @@ class ContactSettingsEntity
         return $this->objectConfirmation;
     }
 
-
     /**
      * @return string|null
      */
@@ -55,5 +54,4 @@ class ContactSettingsEntity
     {
         return $this->antiSpam;
     }
-
 }

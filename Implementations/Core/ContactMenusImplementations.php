@@ -5,8 +5,8 @@ namespace CMW\Implementation\Contact\Core;
 use CMW\Interface\Core\IMenus;
 use CMW\Manager\Lang\LangManager;
 
-class ContactMenusImplementations implements IMenus {
-
+class ContactMenusImplementations implements IMenus
+{
     public function getRoutes(): array
     {
         return [
