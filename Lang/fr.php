@@ -76,4 +76,9 @@ return [
             'stats' => 'Afficher les stats',
         ],
     ],
+    'menu' => [
+        'setting' => 'Paramètres',
+        'history' => 'Historique',
+        'stats' => 'Statistiques',
+    ],
 ];

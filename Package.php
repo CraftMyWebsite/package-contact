@@ -44,17 +44,17 @@ class Package implements IPackageConfig
                 permission: null,
                 subMenus: [
                     new PackageSubMenuType(
-                        title: 'Paramètres',
+                        title: LangManager::translate('contact.menu.setting'),
                         permission: 'contact.settings',
                         url: 'contact/settings',
                     ),
                     new PackageSubMenuType(
-                        title: 'Historique',
+                        title: LangManager::translate('contact.menu.history'),
                         permission: 'contact.history',
                         url: 'contact/history',
                     ),
                     new PackageSubMenuType(
-                        title: 'Statistiques',
+                        title: LangManager::translate('contact.menu.stats'),
                         permission: 'contact.stats',
                         url: 'contact/stats',
                     ),
