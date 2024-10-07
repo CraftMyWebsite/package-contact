@@ -150,7 +150,7 @@ class ContactController extends AbstractController
                 LangManager::translate('contact.toaster.delete.error'));
         }
 
-        Redirect::redirectPreviousRoute();
+        Redirect::redirectToAdmin("contact/history");
     }
 
     #[Link('/stats', Link::GET, [], '/cmw-admin/contact')]
