@@ -29,7 +29,7 @@ class ContactPublicController extends AbstractController
     #[Link('/', Link::GET, [], '/contact')]
     private function publicContact(): void
     {
-        View::basicPublicView('Contact', 'main');
+        View::createPublicView('Contact', 'main')->view();
     }
 
     #[NoReturn]
