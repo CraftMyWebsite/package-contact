@@ -2,11 +2,11 @@
 
 namespace CMW\Controller\Contact;
 
-use CMW\Controller\Core\MailController;
 use CMW\Controller\Core\SecurityController;
 use CMW\Manager\Flash\Alert;
 use CMW\Manager\Flash\Flash;
 use CMW\Manager\Lang\LangManager;
+use CMW\Manager\Mail\MailManager;
 use CMW\Manager\Package\AbstractController;
 use CMW\Manager\Router\Link;
 use CMW\Manager\Security\EncryptManager;
@@ -87,8 +87,8 @@ class ContactPublicController extends AbstractController
 
             contactModel::getInstance()->addMessage($encryptedMail, $encryptedName, $encryptedObject, $encryptedContent, 0);
 
-            MailController::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
-            MailController::getInstance()->sendMail($config->getEmail(), '[' . Website::getWebsiteName() . ']' . LangManager::translate('contact.mail.object'), LangManager::translate('contact.mail.mail') . $email . LangManager::translate('contact.mail.name') . $name . LangManager::translate('contact.mail.object_sender') . $object . LangManager::translate('contact.mail.content') . $content);
+            MailManager::getInstance()->sendMail($email, $config->getObjectConfirmation(), $config->getMailConfirmation());
+            MailManager::getInstance()->sendMail($config->getEmail(), '[' . Website::getWebsiteName() . ']' . LangManager::translate('contact.mail.object'), LangManager::translate('contact.mail.mail') . $email . LangManager::translate('contact.mail.name') . $name . LangManager::translate('contact.mail.object_sender') . $object . LangManager::translate('contact.mail.content') . $content);
 
             Flash::send(Alert::SUCCESS, LangManager::translate('core.toaster.success'),
                 LangManager::translate('contact.toaster.send.success'));
