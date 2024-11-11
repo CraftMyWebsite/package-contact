@@ -3,11 +3,12 @@
 namespace CMW\Entity\Contact;
 
 use CMW\Entity\Users\UserEntity;
+use CMW\Manager\Package\AbstractEntity;
 use CMW\Manager\Security\EncryptManager;
 use CMW\Model\Users\UsersModel;
 use CMW\Utils\Date;
 
-class ContactEntity
+class ContactEntity extends AbstractEntity
 {
     private string $id;
     private string $email;

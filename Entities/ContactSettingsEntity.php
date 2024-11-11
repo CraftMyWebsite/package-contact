@@ -2,7 +2,9 @@
 
 namespace CMW\Entity\Contact;
 
-class ContactSettingsEntity
+use CMW\Manager\Package\AbstractEntity;
+
+class ContactSettingsEntity extends AbstractEntity
 {
     private ?string $email;
     private ?string $objectConfirmation;
