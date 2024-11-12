@@ -18,7 +18,7 @@ $description = LangManager::translate('contact.settings.description');
 <div class="card">
 
     <form id="settings" action="" method="post">
-        <?php (new SecurityManager())->insertHiddenToken() ?>
+        <?php SecurityManager::getInstance()->insertHiddenToken() ?>
         <div class="mb-4">
             <label class="toggle">
                 <p class="toggle-label"><?= LangManager::translate('contact.antispam.setting') ?></p>

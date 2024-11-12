@@ -16,7 +16,7 @@ Website::setDescription('Contactez-nous dès maintenant');
 <?php endif;?>
 
 <form style="width: 100%;" method="post">
-    <?php (new SecurityManager())->insertHiddenToken() ?>
+    <?php SecurityManager::getInstance()->insertHiddenToken() ?>
     <div>
         <label for="email" style="display: block">Mail</label>
         <input name="email" id="email" type="email" style="width: 100%" placeholder="mail@craftmywebsite.fr" required>
