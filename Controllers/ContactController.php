@@ -3,6 +3,7 @@
 namespace CMW\Controller\Contact;
 
 use CMW\Controller\Users\UsersController;
+use CMW\Controller\Users\UsersSessionsController;
 use CMW\Manager\Filter\FilterManager;
 use CMW\Manager\Flash\Alert;
 use CMW\Manager\Flash\Flash;
@@ -12,7 +13,6 @@ use CMW\Manager\Router\Link;
 use CMW\Manager\Views\View;
 use CMW\Model\Contact\ContactModel;
 use CMW\Model\Contact\ContactSettingsModel;
-use CMW\Model\Users\UsersModel;
 use CMW\Utils\Redirect;
 use CMW\Utils\Utils;
 use JetBrains\PhpStorm\NoReturn;
@@ -124,7 +124,7 @@ class ContactController extends AbstractController
         UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.history');
 
         $message = contactModel::getInstance()->getMessageById($id);
-        $userId = UsersModel::getCurrentUser()?->getId();
+        $userId = UsersSessionsController::getInstance()->getCurrentUser()?->getId();
 
         if (!is_null($userId) && !$message?->isRead()) {
             contactModel::getInstance()->setMessageState($id, $userId);
