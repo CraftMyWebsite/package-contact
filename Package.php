@@ -47,16 +47,19 @@ class Package implements IPackageConfig
                         title: LangManager::translate('contact.menu.setting'),
                         permission: 'contact.settings',
                         url: 'contact/settings',
+                        subMenus: []
                     ),
                     new PackageSubMenuType(
                         title: LangManager::translate('contact.menu.history'),
                         permission: 'contact.history',
                         url: 'contact/history',
+                        subMenus: []
                     ),
                     new PackageSubMenuType(
                         title: LangManager::translate('contact.menu.stats'),
                         permission: 'contact.stats',
                         url: 'contact/stats',
+                        subMenus: []
                     ),
                 ]
             ),
