@@ -7,13 +7,7 @@ use CMW\Utils\Website;
 Website::setTitle('Contactez-nous');
 Website::setDescription('Contactez-nous dès maintenant');
 ?>
-<?php if (\CMW\Controller\Users\UsersController::isAdminLogged()): ?>
-    <div style="background-color: orange; padding: 6px; margin-bottom: 10px">
-        <span>Votre thème ne gère pas cette page !</span>
-        <br>
-        <small>Seuls les administrateurs voient ce message !</small>
-    </div>
-<?php endif;?>
+<section style="width: 70%;padding-bottom: 6rem;margin: 1rem auto auto;">
 
 <form style="width: 100%;" method="post">
     <?php SecurityManager::getInstance()->insertHiddenToken() ?>
@@ -36,3 +30,4 @@ Website::setDescription('Contactez-nous dès maintenant');
     <?php SecurityController::getPublicData(); ?>
     <button type="submit" style="display: flex; justify-self: center; margin-top: 1rem;">Soumettre</button>
 </form>
+</section>
