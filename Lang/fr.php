@@ -66,6 +66,14 @@ return [
         ],
         'error' => [
             'notConfigured' => 'Merci de correctement configurer le package Contact.',
+            'noMessageSelected' => "Aucun message sélectionné",
+            'deletingMessage' => "Erreur lors de la suppression du message #%id%",
+            'invalidMailFormat' => 'Format d\'email invalide',
+        ],
+        'success' => [
+            'deleteMessages' => '%number% messages supprimés !',
+            'markAsSpam' => 'Message marqué comme spam',
+            'markAsNotSpam' => 'Message marqué comme non spam',
         ],
     ],
     'permissions' => [

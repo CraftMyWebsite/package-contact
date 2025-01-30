@@ -2,187 +2,634 @@
 
 namespace CMW\Controller\Contact;
 
-use CMW\Controller\Users\UsersController;
-use CMW\Controller\Users\UsersSessionsController;
-use CMW\Manager\Filter\FilterManager;
-use CMW\Manager\Flash\Alert;
-use CMW\Manager\Flash\Flash;
-use CMW\Manager\Lang\LangManager;
 use CMW\Manager\Package\AbstractController;
-use CMW\Manager\Router\Link;
-use CMW\Manager\Views\View;
-use CMW\Model\Contact\ContactModel;
-use CMW\Model\Contact\ContactSettingsModel;
-use CMW\Utils\Redirect;
-use CMW\Utils\Utils;
-use JetBrains\PhpStorm\NoReturn;
+use function in_array;
+use function preg_match;
+use function preg_quote;
+use function strrchr;
+use function substr;
 
 /**
  * Class: @ContactController
  * @package Contact
- * @author Teyir
- * @version 0.0.1
  */
 class ContactController extends AbstractController
 {
-    #[Link(path: '/', method: Link::GET, scope: '/cmw-admin/contact')]
-    #[Link('/settings', Link::GET, [], '/cmw-admin/contact')]
-    private function adminContactSettings(): void
+    public function containsBlacklistedWord(string $input): bool
     {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.settings');
-
-        $config = contactSettingsModel::getInstance()->getConfig();
-
-        View::createAdminView('Contact', 'settings')
-            ->addScriptBefore('Admin/Resources/Vendors/Tinymce/tinymce.min.js',
-                'Admin/Resources/Vendors/Tinymce/Config/full_absolute_links.js')
-            ->addVariableList(['config' => $config])
-            ->view();
-    }
-
-    #[NoReturn]
-    #[Link('/settings', Link::POST, [], '/cmw-admin/contact')]
-    private function adminContactSettingsPost(): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.settings');
-
-        [$email, $object, $mail, $antiSpam] = Utils::filterInput('email', 'object', 'mail', 'antiSpam');
-
-        if (is_null($antiSpam)) {
-            $antiSpam = 0;
+        foreach ($this->blacklistedWords as $word) {
+            $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
+            if (preg_match($pattern, $input)) {
+                return true;
+            }
         }
-
-        contactSettingsModel::getInstance()->updateConfig($email ?? null, $antiSpam, $object, $mail);
-
-        Flash::send(Alert::SUCCESS, LangManager::translate('core.toaster.success'),
-            LangManager::translate('core.toaster.config.success'));
-
-        Redirect::redirectPreviousRoute();
+        return false;
     }
 
-    #[Link('/history', Link::GET, [], '/cmw-admin/contact')]
-    private function adminContactHistory(): void
+    public function isEmailBlacklisted(string $email): bool
     {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.history');
-
-        $messages = contactModel::getInstance()->getMessages();
-        $unreadNonSpam = ContactModel::getInstance()->countUnreadNonSpam();
-        $unreadSpam = ContactModel::getInstance()->countUnreadSpam();
-
-        View::createAdminView('Contact', 'history')
-            ->addStyle('Admin/Resources/Assets/Css/simple-datatables.css')
-            ->addScriptAfter('Admin/Resources/Vendors/Simple-datatables/simple-datatables.js',
-                'Admin/Resources/Vendors/Simple-datatables/config-datatables.js')
-            ->addVariableList(['messages' => $messages, 'unreadNonSpam' => $unreadNonSpam, 'unreadSpam' => $unreadSpam])
-            ->view();
+        $domain = substr(strrchr($email, '@'), 1);
+        return in_array($domain, $this->blacklistedDomains, false);
     }
 
-    #[Link('/history/spam', Link::GET, [], '/cmw-admin/contact')]
-    private function adminContactHistorySpam(): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.history');
+    public array $blacklistedWords = [
+        'porn', 'porno', 'sex', 'sexy', 'xxx', 'adult', 'erotic', 'nude', 'nudity', 'hentai',
+        'escort', 'camgirl', 'camsex', 'cams', 'anal', 'barelylegal', 'bdsm', 'bestiality', 'bimbo',
+        'blowjob', 'boobs', 'booty', 'bukkake', 'butt', 'chaturbate', 'cocks', 'creampie', 'cunnilingus',
+        'cum', 'cumshot', 'deepthroat', 'dildo', 'doggystyle', 'domination', 'dominatrix', 'ejaculation',
+        'facial', 'femdom', 'fisting', 'footjob', 'gangbang', 'handjob', 'hardcore', 'hustler', 'incest',
+        'jerkoff', 'lesbian', 'lust', 'milf', 'orgasm', 'orgy', 'panties', 'pegging', 'penetration',
+        'penis', 'pissing', 'playboy', 'pornhub', 'porno', 'pornstar', 'prostitute', 'pussy', 'rape',
+        'rimming', 'shemale', 'slut', 'spanking', 'strip', 'stripper', 'suck', 'swinger', 'tits',
+        'twink', 'upskirt', 'vagina', 'voyeur', 'whore', 'xhamster', 'xvideos', 'youporn', 'zoophilia',
+        'fetish', 'kink', 'bdsm', 'bondage', 'submissive', 'dominant', 's&m', 'masterbation', 'masturbate',
+        'sexting', 'cam', 'camsex', 'livecam', 'erotica', 'adultfriendfinder', '3some', '4some', 'arousal',
+        'ass', 'asshole', 'ballgag', 'bangbros', 'bbw', 'beaver', 'beeg', 'bj', 'bondage', 'boner',
+        'brazzers', 'bukakke', 'bush', 'clit', 'clitoris', 'cock', 'coitus', 'cunt', 'dick', 'dildo',
+        'dogging', 'doggystyle', 'ejaculate', 'fap', 'fingering', 'fleshlight', 'freaky', 'fuck', 'gangbang',
+        'handjob', 'hentai', 'hustler', 'jizz', 'kamasutra', 'knockers', 'lingerie', 'mature', 'nipple',
+        'nipples', 'nude', 'nudity', 'orgy', 'panty', 'pornographic', 'pornography', 'queef', 'quicky',
+        'randy', 'rimming', 'sexcam', 'shaved', 'smut', 'snatch', 'spank', 'tit', 'topless',
+        'vajayjay', 'voyeur', 'wank', 'x-rated', 'xxx', 'youporn', 'zoophilia', 'zooporn', 'price', 'sell', 'buy',
+        'spam', 'spamm', 'prices', 'site', 'website', 'domain', 'reseller', 'SEO', 'date', 'dating', 'Rewards', 'rewards',
+        'improve', 'website`s', 'casino',
+    ];
 
-        $messages = contactModel::getInstance()->getMessages();
-        $unreadNonSpam = ContactModel::getInstance()->countUnreadNonSpam();
-        $unreadSpam = ContactModel::getInstance()->countUnreadSpam();
-
-        View::createAdminView('Contact', 'historySpam')
-            ->addStyle('Admin/Resources/Assets/Css/simple-datatables.css')
-            ->addScriptAfter('Admin/Resources/Vendors/Simple-datatables/simple-datatables.js',
-                'Admin/Resources/Vendors/Simple-datatables/config-datatables.js')
-            ->addVariableList(['messages' => $messages, 'unreadNonSpam' => $unreadNonSpam, 'unreadSpam' => $unreadSpam])
-            ->view();
-    }
-
-    #[NoReturn]
-    #[Link('/history/deleteSelected', Link::POST, [], '/cmw-admin/contact', secure: false)]
-    private function adminDeleteSelectedPost(): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.settings');
-
-        $messageIds = $_POST['selectedIds'];
-
-        if (empty($messageIds)) {
-            Flash::send(Alert::ERROR, 'Contact', 'Aucun message sélectionné');
-            Redirect::redirectPreviousRoute();
-        }
-
-        $i = 0;
-        foreach ($messageIds as $messageId) {
-            $messageId = FilterManager::filterData($messageId, 11, FILTER_SANITIZE_NUMBER_INT);
-            ContactModel::getInstance()->deleteMessage($messageId);
-            $i++;
-        }
-        Flash::send(Alert::SUCCESS, 'Contact', "$i message supprimé !");
-
-        Redirect::redirectPreviousRoute();
-    }
-
-    #[Link('/read/:id', Link::GET, ['id' => '[0-9]+'], '/cmw-admin/contact')]
-    private function adminContactRead(int $id): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.history');
-
-        $message = contactModel::getInstance()->getMessageById($id);
-        $userId = UsersSessionsController::getInstance()->getCurrentUser()?->getId();
-
-        if (!is_null($userId) && !$message?->isRead()) {
-            contactModel::getInstance()->setMessageState($id, $userId);
-        }
-
-        View::createAdminView('Contact', 'read')
-            ->addScriptAfter('App/Package/Contact/Views/Resources/Js/print.js')
-            ->addVariableList(['message' => $message])
-            ->view();
-    }
-
-    #[NoReturn]
-    #[Link('/delete/:id', Link::GET, ['id' => '[0-9]+'], '/cmw-admin/contact')]
-    private function adminContactDelete(int $id): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.delete');
-
-        if (contactModel::getInstance()->deleteMessage($id)) {
-            Flash::send(Alert::SUCCESS, LangManager::translate('core.toaster.success'),
-                LangManager::translate('contact.toaster.delete.success'));
-        } else {
-            Flash::send(Alert::SUCCESS, LangManager::translate('core.toaster.success'),
-                LangManager::translate('contact.toaster.delete.error'));
-        }
-
-        Redirect::redirectToAdmin("contact/history");
-    }
-
-    #[Link('/stats', Link::GET, [], '/cmw-admin/contact')]
-    private function adminContactStats(): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.stats');
-
-        View::createAdminView('Contact', 'stats')
-            ->view();
-    }
-
-    #[Link('/spam/:id', Link::GET, ['id' => '[0-9]+'], '/cmw-admin/contact')]
-    private function adminContactSpam(int $id): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.history');
-
-        ContactModel::getInstance()->setSpam($id, 1);
-
-        Flash::send(Alert::SUCCESS, LangManager::translate('contact.antispam.title'), 'Marqué comme spam !');
-
-        Redirect::redirectPreviousRoute();
-    }
-
-    #[Link('/nonSpam/:id', Link::GET, ['id' => '[0-9]+'], '/cmw-admin/contact')]
-    private function adminContactNonSpam(int $id): void
-    {
-        UsersController::redirectIfNotHavePermissions('core.dashboard', 'contact.history');
-
-        ContactModel::getInstance()->setSpam($id, 0);
-
-        Flash::send(Alert::SUCCESS, LangManager::translate('contact.antispam.title'), 'Marqué comme non spam !');
-
-        Redirect::redirectPreviousRoute();
-    }
+    public array $blacklistedDomains = [
+        '0-mail.com',
+        '0815.ru',
+        '0clickemail.com',
+        '10minutemail.com',
+        '20minutemail.com',
+        '2prong.com',
+        '30minutemail.com',
+        '33mail.com',
+        '3mail.ga',
+        '4mail.cf',
+        '4mail.ga',
+        '4mail.ml',
+        '5mail.cf',
+        '5mail.ga',
+        '5mail.ml',
+        '6mail.cf',
+        '6mail.ga',
+        '6mail.ml',
+        '7mail.ga',
+        '7mail.ml',
+        '9mail.cf',
+        '9mail.ga',
+        '9mail.ml',
+        'a-bc.net',
+        'a45.in',
+        'a54pd15c.com',
+        'a-bc.net',
+        'anonbox.net',
+        'anonymbox.com',
+        'antichef.net',
+        'antispam.de',
+        'baxomale.ht.cx',
+        'beefmilk.com',
+        'binkmail.com',
+        'bio-muesli.net',
+        'bobmail.info',
+        'bodhi.lawlita.com',
+        'bofthew.com',
+        'boun.cr',
+        'bouncr.com',
+        'breakthru.com',
+        'bsnow.net',
+        'bugmenot.com',
+        'bumpymail.com',
+        'casualdx.com',
+        'centermail.com',
+        'centermail.net',
+        'chogmail.com',
+        'clrmail.com',
+        'cmail.net',
+        'consumerriot.com',
+        'courriel.fr.nf',
+        'courrieltemporaire.com',
+        'curryworld.de',
+        'dacoolest.com',
+        'dandikmail.com',
+        'dayrep.com',
+        'dcemail.com',
+        'deadaddress.com',
+        'deadspam.com',
+        'despam.it',
+        'despammed.com',
+        'devnullmail.com',
+        'dfgh.net',
+        'digitalsanctuary.com',
+        'discardmail.com',
+        'discardmail.de',
+        'disposableaddress.com',
+        'disposableemailaddresses.com',
+        'disposableemailaddresses:emailmiser.com',
+        'disposeamail.com',
+        'dispostable.com',
+        'dm.w3internet.co.uk',
+        'dodgeit.com',
+        'dodgit.com',
+        'dodgit.org',
+        'dontreg.com',
+        'dontsendmespam.de',
+        'dump-email.info',
+        'dumpandjunk.com',
+        'dumpmail.de',
+        'dumpyemail.com',
+        'e4ward.com',
+        'email60.com',
+        'emaildienst.de',
+        'emailias.com',
+        'emailigo.de',
+        'emailinfive.com',
+        'emailmiser.com',
+        'emailsensei.com',
+        'emailtemporanea.net',
+        'emailtemporario.com.br',
+        'emailthe.net',
+        'emailtmp.com',
+        'emailto.de',
+        'emailwarden.com',
+        'emailx.at.hm',
+        'emailxfer.com',
+        'emeil.in',
+        'emeil.ir',
+        'emz.net',
+        'enterto.com',
+        'ephemail.net',
+        'etranquil.com',
+        'etranquil.net',
+        'etranquil.org',
+        'evopo.com',
+        'explodemail.com',
+        'express.net.ua',
+        'eyepaste.com',
+        'fakeinbox.com',
+        'fakeinformation.com',
+        'fansworldwide.de',
+        'fantasymail.de',
+        'fastacura.com',
+        'fastchevy.com',
+        'fastchrysler.com',
+        'fastkawasaki.com',
+        'fastmazda.com',
+        'fastmitsubishi.com',
+        'fastnissan.com',
+        'fastsubaru.com',
+        'fastsuzuki.com',
+        'fasttoyota.com',
+        'fastyamaha.com',
+        'fightallspam.com',
+        'fizmail.com',
+        'fleckens.hu',
+        'fr33mail.info',
+        'frapmail.com',
+        'front14.org',
+        'fudgerub.com',
+        'fux0ringduh.com',
+        'garliclife.com',
+        'gehensiemirnichtaufdensack.de',
+        'get1mail.com',
+        'get2mail.fr',
+        'getairmail.com',
+        'getmails.eu',
+        'getonemail.com',
+        'getonemail.net',
+        'girlsundertheinfluence.com',
+        'gishpuppy.com',
+        'gmial.com',
+        'goemailgo.com',
+        'gotmail.net',
+        'gotmail.org',
+        'gotti.otherinbox.com',
+        'great-host.in',
+        'greensloth.com',
+        'grr.la',
+        'gsrv.co.uk',
+        'guerillamail.biz',
+        'guerillamail.com',
+        'guerillamail.net',
+        'guerillamail.org',
+        'guerrillamail.biz',
+        'guerrillamail.com',
+        'guerrillamail.de',
+        'guerrillamail.info',
+        'guerrillamail.net',
+        'guerrillamail.org',
+        'guerrillamailblock.com',
+        'haltospam.com',
+        'hatespam.org',
+        'herp.in',
+        'hidemail.de',
+        'hidzz.com',
+        'hochsitze.com',
+        'hopemail.biz',
+        'ieh-mail.de',
+        'imap.cc',
+        'inbax.tk',
+        'inbox.si',
+        'inboxalias.com',
+        'inboxclean.com',
+        'inboxclean.org',
+        'infocom.zp.ua',
+        'instant-mail.de',
+        'ipoo.org',
+        'irish2me.com',
+        'iwi.net',
+        'jetable.com',
+        'jetable.fr.nf',
+        'jetable.net',
+        'jetable.org',
+        'jnxjn.com',
+        'jourrapide.com',
+        'jsrsolutions.com',
+        'kasmail.com',
+        'kaspop.com',
+        'killmail.com',
+        'killmail.net',
+        'kir.ch.tc',
+        'klassmaster.com',
+        'klassmaster.net',
+        'klzlk.com',
+        'koszmail.pl',
+        'kurzepost.de',
+        'lifebyfood.com',
+        'link2mail.net',
+        'litedrop.com',
+        'lol.ovpn.to',
+        'lookugly.com',
+        'lopl.co.cc',
+        'lortemail.dk',
+        'lr7.us',
+        'm4ilweb.info',
+        'mail-filter.com',
+        'mail-temporaire.fr',
+        'mail.by',
+        'mail.mezimages.net',
+        'mail.zp.ua',
+        'mail1a.de',
+        'mail21.cc',
+        'mail2rss.org',
+        'mail333.com',
+        'mailbidon.com',
+        'mailblocks.com',
+        'mailbucket.org',
+        'mailcat.biz',
+        'mailcatch.com',
+        'mailde.de',
+        'mailde.info',
+        'maildrop.cc',
+        'maileater.com',
+        'mailed.in',
+        'mailexpire.com',
+        'mailfa.tk',
+        'mailforspam.com',
+        'mailfreeonline.com',
+        'mailguard.me',
+        'mailin8r.com',
+        'mailinater.com',
+        'mailinator.co.uk',
+        'mailinator.com',
+        'mailinator.net',
+        'mailinator.org',
+        'mailinator.us',
+        'mailinator2.com',
+        'mailincubator.com',
+        'mailismagic.com',
+        'mailme.lv',
+        'mailme24.com',
+        'mailmetrash.com',
+        'mailmoat.com',
+        'mailms.com',
+        'mailna.biz',
+        'mailna.co',
+        'mailna.in',
+        'mailnesia.com',
+        'mailnull.com',
+        'mailorc.com',
+        'mailorg.org',
+        'mailpick.biz',
+        'mailrock.biz',
+        'mailscrap.com',
+        'mailshell.com',
+        'mailsiphon.com',
+        'mailslapping.com',
+        'mailtemp.info',
+        'mailtothis.com',
+        'mailzilla.com',
+        'mailzilla.org',
+        'mailzilla.orgmbx.cc',
+        'makemetheking.com',
+        'mbx.cc',
+        'mega.zik.dj',
+        'meinspamschutz.de',
+        'meltmail.com',
+        'messagebeamer.de',
+        'mezimages.net',
+        'ministry-of-silly-walks.de',
+        'mintemail.com',
+        'misterpinball.de',
+        'moncourrier.fr.nf',
+        'monemail.fr.nf',
+        'monmail.fr.nf',
+        'msa.minsmail.com',
+        'mt2009.com',
+        'mt2014.com',
+        'mx0.wwwnew.eu',
+        'mycleaninbox.net',
+        'mytrashmail.com',
+        'neomailbox.com',
+        'nepwk.com',
+        'nervmich.net',
+        'nervtmich.net',
+        'netmails.net',
+        'netmails.org',
+        'neverbox.com',
+        'nice-4u.com',
+        'nincsmail.hu',
+        'no-spam.ws',
+        'nobulk.com',
+        'nobuma.com',
+        'noclickemail.com',
+        'nodezine.com',
+        'nogmailspam.info',
+        'nomail.xl.cx',
+        'nomail2me.com',
+        'nomorespamemails.com',
+        'nonspammer.de',
+        'nospam.wins.com.br',
+        'nospam.ze.tc',
+        'nospam4.us',
+        'nospamfor.us',
+        'nospammail.net',
+        'nospamthanks.info',
+        'notmailinator.com',
+        'notsharingmy.info',
+        'nowhere.org',
+        'nowmymail.com',
+        'ntlhelp.net',
+        'nullbox.info',
+        'objectmail.com',
+        'obobbo.com',
+        'oneoffemail.com',
+        'onewaymail.com',
+        'onlatedotcom.info',
+        'online.ms',
+        'oopi.org',
+        'opayq.com',
+        'ordinaryamerican.net',
+        'otherinbox.com',
+        'ovpn.to',
+        'owlpic.com',
+        'pancakemail.com',
+        'pepbot.com',
+        'pfui.ru',
+        'plexolan.de',
+        'poczta.onet.pl',
+        'politikerclub.de',
+        'pookmail.com',
+        'privacy.net',
+        'privatdemail.net',
+        'proxymail.eu',
+        'prtnx.com',
+        'putthisinyourspamdatabase.com',
+        'qq.com',
+        'quickinbox.com',
+        'rcpt.at',
+        'reallymymail.com',
+        'recode.me',
+        'recursor.net',
+        'reliable-mail.com',
+        'rhyta.com',
+        'rmqkr.net',
+        'royal.net',
+        'rppkn.com',
+        'rtrtr.com',
+        'safe-mail.net',
+        'safersignup.de',
+        'safetymail.info',
+        'safetypost.de',
+        'saynotospams.com',
+        'selfdestructingmail.com',
+        'sendspamhere.com',
+        'sharklasers.com',
+        'shieldedmail.com',
+        'shiftmail.com',
+        'shitmail.me',
+        'shitware.nl',
+        'shortmail.net',
+        'sibmail.com',
+        'sinnlos-mail.de',
+        'siteposter.net',
+        'skeefmail.com',
+        'slapsfromlastnight.com',
+        'slaskpost.se',
+        'slave-auctions.net',
+        'slopsbox.com',
+        'smellfear.com',
+        'snakemail.com',
+        'sneakemail.com',
+        'sneakmail.de',
+        'snkmail.com',
+        'sofimail.com',
+        'sofort-mail.de',
+        'sogetthis.com',
+        'soodonims.com',
+        'spam.la',
+        'spam.su',
+        'spam4.me',
+        'spamail.de',
+        'spamarrest.com',
+        'spambob.com',
+        'spambob.net',
+        'spambob.org',
+        'spambog.com',
+        'spambog.de',
+        'spambog.ru',
+        'spambooger.com',
+        'spambox.info',
+        'spambox.us',
+        'spamcannon.com',
+        'spamcannon.net',
+        'spamcon.org',
+        'spamcorptastic.com',
+        'spamcowboy.com',
+        'spamcowboy.net',
+        'spamcowboy.org',
+        'spamday.com',
+        'spamdecoy.net',
+        'spamdel.com',
+        'spamdonkey.com',
+        'spamfree.eu',
+        'spamfree24.com',
+        'spamfree24.de',
+        'spamfree24.eu',
+        'spamfree24.info',
+        'spamfree24.net',
+        'spamfree24.org',
+        'spamgoes.in',
+        'spamgourmet.com',
+        'spamgourmet.net',
+        'spamgourmet.org',
+        'spamherelots.com',
+        'spamhereplease.com',
+        'spamhole.com',
+        'spamify.com',
+        'spaml.com',
+        'spaml.de',
+        'spamlot.net',
+        'spamluv.com',
+        'spammotel.com',
+        'spamobox.com',
+        'spamoff.de',
+        'spamslicer.com',
+        'spamspot.com',
+        'spamstack.net',
+        'spamthis.co.uk',
+        'spamthisplease.com',
+        'spamtrail.com',
+        'spamtroll.net',
+        'speed.1s.fr',
+        'spoofmail.de',
+        'stuffmail.de',
+        'suremail.info',
+        'talkinator.com',
+        'teewars.org',
+        'teleworm.com',
+        'teleworm.us',
+        'temp-mail.org',
+        'temp-mail.ru',
+        'tempalias.com',
+        'tempe-mail.com',
+        'tempemail.co.za',
+        'tempemail.com',
+        'tempemail.net',
+        'tempinbox.co.uk',
+        'tempinbox.com',
+        'tempmail.eu',
+        'tempmail.it',
+        'tempmail2.com',
+        'tempmaildemo.com',
+        'tempmailer.com',
+        'tempmailer.de',
+        'tempomail.fr',
+        'temporarily.de',
+        'temporarioemail.com.br',
+        'temporaryemail.net',
+        'temporaryforwarding.com',
+        'temporaryinbox.com',
+        'temporarymailaddress.com',
+        'tempthe.net',
+        'thankyou2010.com',
+        'thc.st',
+        'thelimestones.com',
+        'thisisnotmyrealemail.com',
+        'thismail.net',
+        'throwawayemailaddress.com',
+        'throwawaymail.com',
+        'tilien.com',
+        'tittbit.in',
+        'tizi.com',
+        'tmailinator.com',
+        'toomail.biz',
+        'top100mail.com',
+        'topranklist.de',
+        'tradermail.info',
+        'trash-mail.at',
+        'trash-mail.com',
+        'trash-mail.de',
+        'trash2009.com',
+        'trash2010.com',
+        'trash-amil.com',
+        'trashbox.eu',
+        'trashdevil.com',
+        'trashdevil.de',
+        'trashemail.de',
+        'trashmail.at',
+        'trashmail.com',
+        'trashmail.de',
+        'trashmail.me',
+        'trashmail.net',
+        'trashmail.org',
+        'trashmail.ws',
+        'trashmailer.com',
+        'trashymail.com',
+        'trashymail.net',
+        'trayna.com',
+        'trbvm.com',
+        'trialmail.de',
+        'trillianpro.com',
+        'tryalert.com',
+        'turual.com',
+        'twinmail.de',
+        'tyldd.com',
+        'uggsrock.com',
+        'umail.net',
+        'unmail.ru',
+        'upliftnow.com',
+        'uplipht.com',
+        'uroid.com',
+        'us.af',
+        'venompen.com',
+        'veryrealemail.com',
+        'viditag.com',
+        'viewcastmedia.com',
+        'viewcastmedia.net',
+        'viewcastmedia.org',
+        'viralplays.com',
+        'vpn.st',
+        'vsimcard.com',
+        'vubby.com',
+        'vztc.com',
+        'wasteland.rfc822.org',
+        'webemail.me',
+        'webm4il.info',
+        'webuser.in',
+        'wee.my',
+        'wefjo.grn.cc',
+        'weg-werf-email.de',
+        'wegwerf-email-addressen.de',
+        'wegwerf-emails.de',
+        'wegwerfadresse.de',
+        'wegwerfemail.de',
+        'wegwerfmail.de',
+        'wegwerfmail.info',
+        'wegwerfmail.net',
+        'wegwerfmail.org',
+        'welikecookies.com',
+        'wh4f.org',
+        'whyspam.me',
+        'willhackforfood.biz',
+        'willselfdestruct.com',
+        'winemaven.info',
+        'wronghead.com',
+        'wuzup.net',
+        'wuzupmail.net',
+        'wwwnew.eu',
+        'x.ip6.li',
+        'xagloo.com',
+        'xemaps.com',
+        'xents.com',
+        'xmaily.com',
+        'xoxy.net',
+        'yep.it',
+        'yogamaven.com',
+        'yopmail.com',
+        'yopmail.fr',
+        'yopmail.net',
+        'yourdomain.com',
+        'ypmail.webarnak.fr.eu.org',
+        'yuurok.com',
+        'zehnminuten.de',
+        'zehnminutenmail.de',
+        'zippymail.info',
+        'zoemail.net',
+        'zoemail.org',
+        'zomg.info',
+        'zumail.net',
+        'zxcv.com',
+        'zzz.com',
+    ];
 }
